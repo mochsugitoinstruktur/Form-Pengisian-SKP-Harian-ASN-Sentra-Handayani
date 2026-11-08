@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pengisian SKP Harian - Kementerian Sosial RI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- HTML2PDF JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Standard A4 dimensions & printable page styling */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            padding: 10mm 15mm 8mm 15mm;
+            box-sizing: border-box;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .rendering-pdf {
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
+            page-break-inside: avoid !important;
+        }
+
+        .rendering-pdf img {
+            max-height: 18mm !important;
+            object-fit: contain !important;
+        }
+
+        @media (max-width: 900px) {
+            .a4-page-container {
+                overflow-x: auto;
+            }
+            .a4-page {
+                min-width: 210mm;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+    
+    <!-- Header App Bar -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow overflow-hidden">
+                    <img id="kopLogo" src="Kementerian_Sosial.png" alt="Logo Kemensos" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight">Pengisian SKP Harian</h1>
+                    <p class="text-xs text-blue-200">Kementerian Sosial Republik Indonesia</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="resetForm()" class="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white font-medium rounded shadow transition">
+                    <i class="fas fa-undo mr-1"></i> Reset Data
+                </button>
+                <button onclick="exportToPDF()" class="px-4 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded shadow transition flex items-center">
+                    <i class="fas fa-file-pdf text-sm mr-1.5"></i> Ekspor PDF (A4 Portrait)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Workspace -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Input Form Section (Left Column) -->
+        <section class="lg:col-span-5 space-y-5">
+            
+            <!-- Form Data Pegawai -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide border-b pb-2 mb-3 flex items-center">
+                    <i class="fas fa-id-card text-blue-600 mr-2"></i> Data Pegawai
+                </h2>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Nama Pegawai</label>
+                        <input type="text" id="input-nama" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">NIP</label>
+                            <input type="text" id="input-nip" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">Pangkat / Gol.</label>
+                            <input type="text" id="input-pangkat" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">Jabatan</label>
+                            <input type="text" id="input-jabatan" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">Tanggal Kegiatan</label>
+                            <input type="date" id="input-tanggal" onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Dibuat Di (Kota / Tempat)</label>
+                        <input type="text" id="input-tempat" oninput="updatePreview()" placeholder="Contoh: Jakarta" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <!-- Upload / Gambar Tanda Tangan Pegawai -->
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Tanda Tangan Digital Pegawai</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="file" id="input-ttd-file" accept="image/*" onchange="handleSignatureUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded">
+                            <button type="button" onclick="clearSignature()" class="px-2 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 text-xs font-semibold shrink-0">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Tambah Kegiatan Harian -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide border-b pb-2 mb-3 flex items-center justify-between">
+                    <span><i class="fas fa-tasks text-blue-600 mr-2"></i> Input Kegiatan Harian</span>
+                    <span id="activity-count-badge" class="bg-blue-100 text-blue-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">0 Kegiatan</span>
+                </h2>
+                
+                <form id="activity-form" onsubmit="addActivity(event)" class="space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">Jam Mulai</label>
+                            <input type="time" id="act-jam-mulai" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">Jam Selesai</label>
+                            <input type="time" id="act-jam-selesai" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Uraian / Deskripsi Kegiatan</label>
+                        <textarea id="act-deskripsi" rows="2" required placeholder="Contoh: Mengikuti rapat keanggotaan pokja..." class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block font-medium text-slate-700 mb-1">Opsi Dokumentasi</label>
+                        <select id="act-doc-type" onchange="toggleDocInputType()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                            <option value="photo">Foto Dokumentasi Kegiatan</option>
+                            <option value="camera">Ambil Foto Kamera (Timestamp & GPS)</option>
+                            <option value="document">Upload Dokumen Lampiran (Maks 10MB)</option>
+                        </select>
+                    </div>
+
+                    <div id="container-photo-input" class="space-y-2">
+                        <label class="block font-medium text-slate-700">Upload Foto Dokumentasi</label>
+                        <input type="file" id="act-photo-file" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded">
+                        <input type="url" id="act-photo-url" placeholder="atau Masukkan URL Gambar (https://...)" class="w-full p-2 border border-slate-300 rounded outline-none text-xs">
+                    </div>
+
+                    <div id="container-camera-input" class="hidden">
+                        <button type="button" onclick="openCameraModal()" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold rounded hover:bg-indigo-100 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-camera"></i> Buka Kamera Langsung
+                        </button>
+                    </div>
+
+                    <div id="container-document-input" class="hidden space-y-1">
+                        <label class="block font-medium text-slate-700">Pilih Berkas Dokumen (Maks. 10MB)</label>
+                        <input type="file" id="act-doc-file" accept=".pdf,.doc,.docx,.jpg,.png" onchange="handleDocUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 border border-slate-300 rounded">
+                        <p class="text-[10px] text-slate-500">Format didukung: PDF, Word, JPG, PNG.</p>
+                    </div>
+
+                    <div id="photo-preview-box" class="hidden relative rounded border border-slate-200 bg-slate-50 p-2 text-center">
+                        <img id="temp-img-preview" src="" alt="Pratinjau Foto" class="max-h-32 mx-auto rounded object-contain">
+                        <div id="temp-doc-info" class="hidden text-xs text-slate-700 font-medium py-2">
+                            <i class="fas fa-file-pdf text-red-500 text-lg block mb-1"></i>
+                            <span id="temp-doc-name" class="block truncate"></span>
+                        </div>
+                        <button type="button" onclick="clearTempImage()" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition flex items-center justify-center gap-1 shadow">
+                        <i class="fas fa-plus"></i> Tambah Kegiatan Ke Laporan
+                    </button>
+                </form>
+
+                <div class="mt-4 border-t pt-3">
+                    <h3 class="font-bold text-xs text-slate-700 mb-2">Daftar Kegiatan Yang Ditambahkan:</h3>
+                    <div id="activity-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PDF Document Live Preview (Right Column) -->
+        <section class="lg:col-span-7 flex flex-col items-center">
+            <div class="w-full flex justify-between items-center mb-2 px-1 max-w-[210mm]">
+                <span class="text-xs font-semibold text-slate-600"><i class="fas fa-eye mr-1"></i> Pratinjau Dokumen PDF (A4 Portrait)</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">Otomatis Terperbarui</span>
+            </div>
+
+            <!-- PDF Page Wrapper -->
+            <div class="a4-page-container w-full flex justify-center overflow-x-auto pb-4">
+                <div id="pdf-content" class="a4-page bg-white shadow-xl rounded border border-slate-300 text-[9.5pt] leading-relaxed font-sans">
+                    
+                    <div class="w-full flex-grow flex flex-col">
+                        
+                        <!-- Official Letterhead Header -->
+                        <div class="flex items-center pb-2 border-b-2 border-slate-900 mb-3 gap-3">
+                            <div class="w-16 flex-shrink-0 flex justify-center items-center">
+                                <img id="prev-logo-img" src="Kementerian_Sosial.png" alt="Logo Kemensos" crossorigin="anonymous" class="max-h-16 w-auto object-contain">
+                            </div>
+                            
+                            <div class="flex-grow text-center pr-4">
+                                <h2 class="font-bold text-xs sm:text-xs tracking-wide text-slate-900 uppercase">
+                                    LAPORAN KINERJA HARIAN PEGAWAI TAHUN <span id="prev-tahun">2026</span>
+                                </h2>
+                                <h3 class="font-bold text-[9pt] tracking-wide text-slate-800 uppercase">
+                                    KEMENTERIAN SOSIAL
+                                </h3>
+                                <h1 class="font-extrabold text-sm sm:text-base text-slate-900 uppercase tracking-tight my-0.5">
+                                    SENTRA HANDAYANI JAKARTA
+                                </h1>
+                                <p class="text-[8pt] font-medium text-slate-700">
+                                    Alamat : Jl Komp PPA No1 Bambu Apus Cipayung Jakarta Timur
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Employee Info Table -->
+                        <table class="w-full text-[8.5pt] mb-3 border-collapse">
+                            <tr>
+                                <td class="w-32 py-0.5 font-medium text-slate-800">Nama Pegawai</td>
+                                <td class="w-3 py-0.5 text-center">:</td>
+                                <td id="prev-nama" class="py-0.5 font-semibold text-slate-900">Moch. Sugito S.T.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-medium text-slate-800">NIP</td>
+                                <td class="py-0.5 text-center">:</td>
+                                <td id="prev-nip" class="py-0.5 text-slate-900">199205262025061002</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-medium text-slate-800">Jabatan</td>
+                                <td class="py-0.5 text-center">:</td>
+                                <td id="prev-jabatan" class="py-0.5 text-slate-900">Instruktur Ahli Pertama</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-medium text-slate-800">Pangkat</td>
+                                <td class="py-0.5 text-center">:</td>
+                                <td id="prev-pangkat" class="py-0.5 text-slate-900">Penata Muda</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-medium text-slate-800">Tanggal Kegiatan</td>
+                                <td class="py-0.5 text-center">:</td>
+                                <td id="prev-tanggal" class="py-0.5 text-slate-900">03 Agustus 2026</td>
+                            </tr>
+                        </table>
+
+                        <!-- Activity Table -->
+                        <div class="w-full">
+                            <table class="w-full border-collapse border border-slate-900 text-[8.5pt]">
+                                <thead>
+                                    <tr class="bg-slate-100 text-center font-bold text-slate-900">
+                                        <th class="border border-slate-900 p-1.5 w-10 text-center">No</th>
+                                        <th class="border border-slate-900 p-1.5 text-center">Tugas dan Kegiatan</th>
+                                        <th class="border border-slate-900 p-1.5 w-48 text-center">Dokumentasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prev-activity-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Right Signature Block -->
+                    <div class="w-full flex justify-end mt-4 pt-2 text-[9pt]">
+                        <div class="text-center w-64 flex flex-col items-center leading-snug">
+                            <p id="prev-tgl-surat" class="text-center w-full">Dibuat di Jakarta<br>pada tanggal 03 Agustus 2026</p>
+                            <p id="prev-jabatan-ttd" class="font-bold text-slate-900 mt-1">Instruktur Ahli Pertama</p>
+                            
+                            <div class="h-16 w-full flex items-center justify-center relative my-1">
+                                <img id="prev-ttd-img" src="" alt="Tanda Tangan" class="max-h-16 w-auto object-contain hidden">
+                            </div>
+
+                            <p id="prev-nama-ttd" class="font-bold uppercase text-slate-900 underline tracking-wide">MOCH. SUGITO S.T.</p>
+                            <p id="prev-nip-ttd" class="text-slate-900">NIP.199205262025061002</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Camera Modal Dialog -->
+    <div id="camera-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl max-w-md w-full p-4 shadow-2xl relative space-y-3">
+            <h3 class="font-bold text-sm text-slate-800 flex items-center">
+                <i class="fas fa-camera text-blue-600 mr-2"></i> Ambil Foto Kamera (GPS + Watermark Waktu)
+            </h3>
+            <div class="relative bg-black rounded-lg overflow-hidden aspect-video flex items-center justify-center">
+                <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                <div id="camera-loading" class="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs">
+                    Memuat kamera & mendapatkan lokasi...
+                </div>
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button type="button" onclick="closeCameraModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs rounded font-medium">Batal</button>
+                <button type="button" onclick="captureCameraPhoto()" class="px-4 py-1.5 bg-blue-600 text-white text-xs rounded font-semibold flex items-center gap-1">
+                    <i class="fas fa-circle text-[10px]"></i> Ambil Foto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="watermark-canvas" class="hidden"></canvas>
+
+    <script>
+        const STORAGE_KEY = 'SKP_KEMENSOS_DATA_STORAGE';
+        const DEFAULT_LOGO = "Kementerian_Sosial.png"; // Nama file tanpa spasi
+
+        const defaultData = {
+            nama: "Moch. Sugito S.T.",
+            nip: "199205262025061002",
+            jabatan: "Instruktur Ahli Pertama",
+            pangkat: "Penata Muda",
+            tanggal: "2026-08-03",
+            tempat: "Jakarta",
+            logoUrl: DEFAULT_LOGO,
+            signatureUrl: "",
+            kegiatan: [
+                {
+                    id: '1',
+                    jamMulai: '07:30',
+                    jamSelesai: '12:30',
+                    deskripsi: 'Mengikuti rapat keanggotaan pokja di sentra handayani 2',
+                    type: 'photo',
+                    photoUrl: 'https://placehold.co/400x300/cbd5e1/475569?text=Dokumentasi+Rapat'
+                },
+                {
+                    id: '2',
+                    jamMulai: '13:00',
+                    jamSelesai: '18:00',
+                    deskripsi: 'Bertugas sebagai admin wa center konsultasi bantuan sosial',
+                    type: 'photo',
+                    photoUrl: 'https://placehold.co/400x300/e2e8f0/334155?text=Dokumentasi+WA+Center'
+                }
+            ]
+        };
+
+        let appData = { ...defaultData };
+        let currentCapturedImage = '';
+        let mediaStream = null;
+
+        function initApp() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch (e) {
+                    appData = { ...defaultData };
+                }
+            }
+            appData.logoUrl = DEFAULT_LOGO;
+            populateFormInputs();
+            preloadLocalLogo();
+        }
+
+        function preloadLocalLogo() {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const dataURL = canvas.toDataURL('image/png');
+                
+                appData.logoUrl = dataURL;
+                updatePreview();
+            };
+            img.onerror = function() {
+                appData.logoUrl = DEFAULT_LOGO;
+                updatePreview();
+            };
+            img.src = DEFAULT_LOGO;
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function populateFormInputs() {
+            document.getElementById('input-nama').value = appData.nama || '';
+            document.getElementById('input-nip').value = appData.nip || '';
+            document.getElementById('input-jabatan').value = appData.jabatan || '';
+            document.getElementById('input-pangkat').value = appData.pangkat || '';
+            document.getElementById('input-tanggal').value = appData.tanggal || '2026-08-03';
+            document.getElementById('input-tempat').value = appData.tempat || 'Jakarta';
+        }
+
+        function handleSignatureUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    appData.signatureUrl = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearSignature() {
+            appData.signatureUrl = "";
+            document.getElementById('input-ttd-file').value = '';
+            updatePreview();
+        }
+
+        function updatePreview() {
+            appData.nama = document.getElementById('input-nama').value;
+            appData.nip = document.getElementById('input-nip').value;
+            appData.jabatan = document.getElementById('input-jabatan').value;
+            appData.pangkat = document.getElementById('input-pangkat').value;
+            appData.tanggal = document.getElementById('input-tanggal').value;
+            appData.tempat = document.getElementById('input-tempat').value || 'Jakarta';
+
+            document.getElementById('prev-nama').innerText = appData.nama || '-';
+            document.getElementById('prev-nip').innerText = appData.nip || '-';
+            document.getElementById('prev-jabatan').innerText = appData.jabatan || '-';
+            document.getElementById('prev-pangkat').innerText = appData.pangkat || '-';
+
+            const formattedDate = formatDate(appData.tanggal);
+            const yearStr = appData.tanggal ? new Date(appData.tanggal).getFullYear() : '2026';
+            
+            document.getElementById('prev-tanggal').innerText = formattedDate;
+            document.getElementById('prev-tahun').innerText = yearStr;
+
+            document.getElementById('prev-tgl-surat').innerHTML = `Dibuat di ${appData.tempat}<br>pada tanggal ${formattedDate}`;
+            document.getElementById('prev-jabatan-ttd').innerText = appData.jabatan || 'Instruktur Ahli Pertama';
+            document.getElementById('prev-nama-ttd').innerText = appData.nama || 'MOCH. SUGITO S.T.';
+            document.getElementById('prev-nip-ttd').innerText = `NIP.${appData.nip || ''}`;
+            
+            const logoImg = document.getElementById('prev-logo-img');
+            logoImg.src = appData.logoUrl || DEFAULT_LOGO;
+
+            const kopLogoHeader = document.getElementById('kopLogo');
+            if(kopLogoHeader) kopLogoHeader.src = appData.logoUrl || DEFAULT_LOGO;
+
+            const ttdImg = document.getElementById('prev-ttd-img');
+            if (appData.signatureUrl) {
+                ttdImg.src = appData.signatureUrl;
+                ttdImg.classList.remove('hidden');
+            } else {
+                ttdImg.classList.add('hidden');
+            }
+
+            renderActivities();
+            saveToStorage();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '03 Agustus 2026';
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) return dateString;
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = months[d.getMonth()];
+            const year = d.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
+
+        function toggleDocInputType() {
+            const type = document.getElementById('act-doc-type').value;
+            document.getElementById('container-photo-input').classList.toggle('hidden', type !== 'photo');
+            document.getElementById('container-camera-input').classList.toggle('hidden', type !== 'camera');
+            document.getElementById('container-document-input').classList.toggle('hidden', type !== 'document');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentCapturedImage = e.target.result;
+                    showTempPreview(currentCapturedImage);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleDocUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Ukuran berkas melebihi batas maksimal 10MB!');
+                event.target.value = '';
+                return;
+            }
+            
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentCapturedImage = e.target.result;
+                    showTempPreview(currentCapturedImage);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                currentCapturedImage = {
+                    fileName: file.name,
+                    fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+                };
+                document.getElementById('photo-preview-box').classList.remove('hidden');
+                document.getElementById('temp-img-preview').classList.add('hidden');
+                document.getElementById('temp-doc-info').classList.remove('hidden');
+                document.getElementById('temp-doc-name').innerText = file.name;
+            }
+        }
+
+        function showTempPreview(imgSrc) {
+            const previewBox = document.getElementById('photo-preview-box');
+            const imgElem = document.getElementById('temp-img-preview');
+            const docInfo = document.getElementById('temp-doc-info');
+            
+            imgElem.src = imgSrc;
+            imgElem.classList.remove('hidden');
+            docInfo.classList.add('hidden');
+            previewBox.classList.remove('hidden');
+        }
+
+        function clearTempImage() {
+            currentCapturedImage = '';
+            document.getElementById('act-photo-file').value = '';
+            document.getElementById('act-photo-url').value = '';
+            document.getElementById('act-doc-file').value = '';
+            document.getElementById('photo-preview-box').classList.add('hidden');
+        }
+
+        async function openCameraModal() {
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('webcam-video');
+            const loading = document.getElementById('camera-loading');
+            
+            modal.classList.remove('hidden');
+            loading.classList.remove('hidden');
+
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = mediaStream;
+                loading.classList.add('hidden');
+            } catch (err) {
+                alert('Gagal mengakses kamera: ' + err.message);
+                closeCameraModal();
+            }
+        }
+
+        function closeCameraModal() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('camera-modal').classList.add('hidden');
+        }
+
+        function captureCameraPhoto() {
+            const video = document.getElementById('webcam-video');
+            const canvas = document.getElementById('watermark-canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const now = new Date();
+            const timestamp = now.toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+
+            const drawWatermark = (locationText) => {
+                const padding = 15;
+                const fontSize = Math.max(12, Math.floor(canvas.width / 40));
+                ctx.font = `bold ${fontSize}px sans-serif`;
+
+                const textLines = [
+                    `⏱ ${timestamp}`,
+                    `📍 ${locationText}`
+                ];
+
+                const boxHeight = textLines.length * (fontSize + 6) + padding;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                ctx.fillRect(0, canvas.height - boxHeight, canvas.width, boxHeight);
+
+                ctx.fillStyle = '#ffffff';
+                textLines.forEach((line, index) => {
+                    ctx.fillText(line, padding, canvas.height - boxHeight + padding + (index * (fontSize + 6)) + fontSize - 4);
+                });
+
+                currentCapturedImage = canvas.toDataURL('image/jpeg', 0.85);
+                showTempPreview(currentCapturedImage);
+                closeCameraModal();
+            };
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const loc = `Lat: ${pos.coords.latitude.toFixed(4)}, Long: ${pos.coords.longitude.toFixed(4)}`;
+                        drawWatermark(loc);
+                    },
+                    () => {
+                        drawWatermark('Sentra Handayani Jakarta');
+                    },
+                    { timeout: 5000 }
+                );
+            } else {
+                drawWatermark('Sentra Handayani Jakarta');
+            }
+        }
+
+        function addActivity(e) {
+            e.preventDefault();
+            const jamMulai = document.getElementById('act-jam-mulai').value;
+            const jamSelesai = document.getElementById('act-jam-selesai').value;
+            const deskripsi = document.getElementById('act-deskripsi').value;
+            const type = document.getElementById('act-doc-type').value;
+            const urlInput = document.getElementById('act-photo-url').value;
+
+            let finalImage = currentCapturedImage;
+            if (type === 'photo' && !finalImage && urlInput) {
+                finalImage = urlInput;
+            }
+
+            const newAct = {
+                id: Date.now().toString(),
+                jamMulai,
+                jamSelesai,
+                deskripsi,
+                type,
+                photoUrl: finalImage
+            };
+
+            appData.kegiatan.push(newAct);
+            updatePreview();
+
+            document.getElementById('activity-form').reset();
+            clearTempImage();
+            toggleDocInputType();
+        }
+
+        function deleteActivity(id) {
+            appData.kegiatan = appData.kegiatan.filter(a => a.id !== id);
+            updatePreview();
+        }
+
+        function renderActivities() {
+            const listContainer = document.getElementById('activity-list');
+            const tableBody = document.getElementById('prev-activity-table-body');
+            const badge = document.getElementById('activity-count-badge');
+
+            listContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+            badge.innerText = `${appData.kegiatan.length} Kegiatan`;
+
+            if (appData.kegiatan.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="border border-slate-900 p-4 text-center text-slate-500 italic">
+                            Belum ada kegiatan yang ditambahkan.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            appData.kegiatan.forEach((act, idx) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'flex justify-between items-center bg-slate-50 p-2 rounded border text-xs';
+                listItem.innerHTML = `
+                    <div class="truncate mr-2">
+                        <span class="font-semibold text-blue-700">[${act.jamMulai} - ${act.jamSelesai}]</span>
+                        <p class="truncate text-slate-700">${act.deskripsi}</p>
+                    </div>
+                    <button onclick="deleteActivity('${act.id}')" class="text-red-500 hover:text-red-700 p-1">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                listContainer.appendChild(listItem);
+
+                const tr = document.createElement('tr');
+                let docContent = '';
+
+                if (typeof act.photoUrl === 'object' && act.photoUrl !== null) {
+                    docContent = `
+                        <div class="text-center p-2 bg-slate-50 border rounded text-[8pt]">
+                            <i class="fas fa-file-alt text-amber-600 text-base mb-1 block"></i>
+                            <span class="font-medium block truncate">${act.photoUrl.fileName}</span>
+                            <span class="text-slate-500">${act.photoUrl.fileSize}</span>
+                        </div>
+                    `;
+                } else if (act.photoUrl) {
+                    docContent = `
+                        <img src="${act.photoUrl}" alt="Dokumentasi" class="max-h-28 w-auto mx-auto object-contain rounded border border-slate-300">
+                    `;
+                } else {
+                    docContent = `<span class="text-slate-400 italic text-center block">-</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="border border-slate-900 p-2 text-center align-top font-medium">${idx + 1}</td>
+                    <td class="border border-slate-900 p-2 align-top">
+                        <div class="font-semibold mb-1">Jam Kegiatan: ${act.jamMulai} - ${act.jamSelesai}</div>
+                        <div>${act.deskripsi}</div>
+                    </td>
+                    <td class="border border-slate-900 p-2 align-top text-center">
+                        ${docContent}
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function resetForm() {
+            if (confirm('Apakah Anda yakin ingin mengosongkan kegiatan?')) {
+                appData.kegiatan = [];
+                updatePreview();
+            }
+        }
+
+        async function exportToPDF() {
+            const element = document.getElementById('pdf-content');
+            
+            element.classList.add('rendering-pdf');
+            element.classList.remove('shadow-xl', 'rounded', 'border');
+
+            const namaPegawai = appData.nama || 'Pegawai';
+            const tglFormatted = formatDate(appData.tanggal);
+            const fileNameFormatted = `${namaPegawai} SKP ${tglFormatted}.pdf`;
+
+            const opt = {
+                margin:       0,
+                filename:     fileNameFormatted,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true,
+                    logging: false,
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'avoid-all' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (err) {
+                console.error('PDF Export Error:', err);
+                alert('Gagal mengekspor PDF: Terjadi kesalahan saat memproses gambar/dokumen.');
+            } finally {
+                element.classList.remove('rendering-pdf');
+                element.classList.add('shadow-xl', 'rounded', 'border');
+            }
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
