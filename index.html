@@ -11,8 +11,8 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts Inter & Droid Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Droid+Sans:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- HTML2PDF JS Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -648,7 +648,8 @@
             const drawWatermarkFinal = (locationLines) => {
                 ctx.textAlign = 'right';
                 const fontSize = Math.max(14, Math.floor(canvas.width / 45));
-                ctx.font = `bold ${fontSize}px sans-serif`;
+                // Menggunakan font Droid Sans
+                ctx.font = `bold ${fontSize}px 'Droid Sans', sans-serif`;
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
                 ctx.shadowBlur = 4;
@@ -685,23 +686,24 @@
                                 const district = addr.subdistrict || addr.district || 'Kecamatan Cipayung';
                                 const city = addr.city || addr.city_district || addr.county || 'Kota Jakarta Timur';
                                 const state = addr.state || 'Daerah Khusus Ibukota Jakarta';
-                                drawWatermarkFinal([village, district, city, state]);
+                                // Ditambahkan simbol 📍 di baris lokasi pertama
+                                drawWatermarkFinal([`📍 ${village}`, district, city, state]);
                                 return;
                             }
                         } catch (e) {
                             console.error(e);
                         }
-                        // Fallback default wilayah jika gagal fetch
-                        drawWatermarkFinal(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta']);
+                        // Fallback jika fetch gagal
+                        drawWatermarkFinal(['📍 Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta']);
                     },
                     () => {
-                        // Fallback default wilayah jika GPS ditolak
-                        drawWatermarkFinal(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta']);
+                        // Jika GPS tidak aktif / ditolak
+                        drawWatermarkFinal(['GPS sedang tidak aktif, atur kembali lokasi anda']);
                     },
-                    { timeout: 5000 }
+                    { timeout: 5000, enableHighAccuracy: true }
                 );
             } else {
-                drawWatermarkFinal(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta']);
+                drawWatermarkFinal(['GPS sedang tidak aktif, atur kembali lokasi anda']);
             }
         }
 
