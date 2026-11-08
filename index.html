@@ -53,7 +53,7 @@
         }
 
         .rendering-pdf img {
-            max-height: 18mm !important;
+            max-height: 22mm !important;
             object-fit: contain !important;
         }
 
@@ -74,11 +74,11 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow overflow-hidden">
-                    <img id="kopLogo" src="_Sosial.png" alt="Logo Kemensos" class="w-full h-full object-contain">
+                    <img id="kopLogo" src="Kementerian_Sosial.png" alt="Logo Kemensos" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="font-bold text-base leading-tight">Pengisian SKP Harian</h1>
-                    <p class="text-xs text-blue-200"> Sosial Republik Indonesia</p>
+                    <p class="text-xs text-blue-200">Kementerian Sosial Republik Indonesia</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -234,23 +234,25 @@
                     
                     <div class="w-full flex-grow flex flex-col">
                         
-                        <!-- Official Letterhead Header -->
-                        <div class="flex items-center pb-2 border-b-2 border-slate-900 mb-3 gap-3">
-                            <div class="w-16 flex-shrink-0 flex justify-center items-center">
-                                <img id="prev-logo-img" src="Kementerian_Sosial.png" alt="Logo Kemensos" crossorigin="anonymous" class="max-h-40 w-auto object-contain">
+                        <!-- Official Letterhead Header (Presisi & Proporsional) -->
+                        <div class="flex items-center pb-3 border-b-[3px] border-slate-900 mb-3 gap-4">
+                            <!-- Logo Container -->
+                            <div class="w-20 flex-shrink-0 flex justify-center items-center">
+                                <img id="prev-logo-img" src="Kementerian_Sosial.png" alt="Logo Kemensos" crossorigin="anonymous" class="max-h-20 w-auto object-contain">
                             </div>
                             
-                            <div class="flex-grow text-center pr-4">
-                                <h2 class="font-bold text-xs sm:text-xs tracking-wide text-slate-900 uppercase">
+                            <!-- Header Text Center (Proporsional & Mudah Terbaca) -->
+                            <div class="flex-grow text-center pr-6">
+                                <h2 class="font-bold text-[10pt] tracking-wider text-slate-900 uppercase">
                                     LAPORAN KINERJA HARIAN ASN TAHUN <span id="prev-tahun">2026</span>
                                 </h2>
-                                <h3 class="font-bold text-[9pt] tracking-wide text-slate-800 uppercase">
+                                <h3 class="font-extrabold text-[12pt] tracking-wide text-slate-900 uppercase my-0.5">
                                     KEMENTERIAN SOSIAL
                                 </h3>
-                                <h1 class="font-extrabold text-sm sm:text-base text-slate-900 uppercase tracking-tight my-0.5">
+                                <h1 class="font-extrabold text-[13pt] text-slate-900 uppercase tracking-tight my-0.5">
                                     SENTRA HANDAYANI DI JAKARTA
                                 </h1>
-                                <p class="text-[4pt] font-medium text-slate-700">
+                                <p class="text-[7.5pt] font-medium text-slate-700 mt-0.5 tracking-wide">
                                     Jl. PPA No.1 RT/RW 006/001, Bambu Apus, Kec. Cipayung, Kota Jakarta Timur, DKI Jakarta 13890
                                 </p>
                             </div>
@@ -346,7 +348,7 @@
 
     <script>
         const STORAGE_KEY = 'SKP_KEMENSOS_DATA_STORAGE';
-        const DEFAULT_LOGO = "Kementerian_Sosial.png"; // Nama file tanpa spasi
+        const DEFAULT_LOGO = "Kementerian_Sosial.png";
 
         const defaultData = {
             nama: "Moch. Sugito S.T.",
