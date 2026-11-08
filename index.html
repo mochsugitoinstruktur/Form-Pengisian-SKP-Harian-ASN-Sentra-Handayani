@@ -180,7 +180,7 @@
                         <label class="block font-medium text-slate-700 mb-1">Opsi Dokumentasi</label>
                         <select id="act-doc-type" onchange="toggleDocInputType()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                             <option value="photo">Foto Dokumentasi Kegiatan</option>
-                            <option value="camera">Ambil Foto Kamera (GPS & Maps)</option>
+                            <option value="camera">Ambil Foto Kamera Auto-Rotate (GPS & Maps)</option>
                             <option value="document">Upload Dokumen Lampiran (Maks 10MB)</option>
                         </select>
                     </div>
@@ -193,7 +193,7 @@
 
                     <div id="container-camera-input" class="hidden">
                         <button type="button" onclick="openCameraModal()" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold rounded hover:bg-indigo-100 transition flex items-center justify-center gap-2">
-                            <i class="fas fa-camera"></i> Buka Kamera (GPS Maps)
+                            <i class="fas fa-camera"></i> Buka Kamera Auto-Rotate (GPS Maps)
                         </button>
                     </div>
 
@@ -327,27 +327,34 @@
 
     </main>
 
-    <!-- Camera Modal Dialog (Portrait Aspect Ratio 9:16) -->
+    <!-- Camera Modal Dialog (Auto-Rotate Aspect Ratio) -->
     <div id="camera-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl max-w-xl w-full p-4 shadow-2xl relative space-y-3">
+        <div class="bg-white rounded-xl max-w-md w-full p-4 shadow-2xl relative space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-sm text-slate-800 flex items-center">
-                    <i class="fas fa-camera text-blue-600 mr-2"></i> Kamera Portrait (GPS & Maps)
+                    <i class="fas fa-camera text-blue-600 mr-2"></i> Kamera Auto-Rotate (GPS & Maps)
                 </h3>
                 <button type="button" onclick="switchCamera()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded font-medium flex items-center gap-1.5 transition">
                     <i class="fas fa-sync-alt"></i> Ganti Kamera
                 </button>
             </div>
-            <div class="relative bg-black rounded-lg overflow-hidden aspect-video flex items-center justify-center">
+            
+            <div id="camera-container-box" class="relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-[3/4]">
                 <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
                 <div id="camera-loading" class="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs">
-                    Memuat kamera & mendapatkan lokasi...
+                    Memuat kamera & mendeteksi orientasi...
                 </div>
             </div>
+
+            <div class="flex justify-between items-center text-xs text-slate-500 px-1">
+                <span id="orientation-status"><i class="fas fa-mobile-alt mr-1"></i> Orientasi: Otomatis</span>
+                <span>Putar HP untuk ubah Portrait/Landscape</span>
+            </div>
+
             <div class="flex gap-2 justify-end">
                 <button type="button" onclick="closeCameraModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs rounded font-medium">Batal</button>
                 <button type="button" onclick="captureCameraPhoto()" class="px-4 py-1.5 bg-blue-600 text-white text-xs rounded font-semibold flex items-center gap-1">
-                    <i class="fas fa-circle text-[10px]"></i> Ambil Foto Portrait
+                    <i class="fas fa-circle text-[10px]"></i> Ambil Foto
                 </button>
             </div>
         </div>
@@ -405,6 +412,27 @@
             appData.logoUrl = DEFAULT_LOGO;
             populateFormInputs();
             preloadLocalLogo();
+            
+            // Listener untuk mendeteksi perubahan orientasi perangkat secara real-time
+            window.addEventListener('resize', handleOrientationChange);
+            window.addEventListener('orientationchange', handleOrientationChange);
+        }
+
+        function handleOrientationChange() {
+            const videoBox = document.getElementById('camera-container-box');
+            const statusText = document.getElementById('orientation-status');
+            const video = document.getElementById('webcam-video');
+            if (!videoBox || !video) return;
+
+            const isLandscape = window.innerWidth > window.innerHeight || (screen.orientation && screen.orientation.type.includes('landscape'));
+            
+            if (isLandscape) {
+                videoBox.className = "relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-video w-full max-h-[50vh]";
+                if(statusText) statusText.innerHTML = '<i class="fas fa-tablet-alt mr-1"></i> Orientasi: Landscape';
+            } else {
+                videoBox.className = "relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-[3/4] w-3/4 max-h-[55vh]";
+                if(statusText) statusText.innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Orientasi: Portrait';
+            }
         }
 
         function preloadLocalLogo() {
@@ -580,6 +608,7 @@
         async function openCameraModal() {
             const modal = document.getElementById('camera-modal');
             modal.classList.remove('hidden');
+            handleOrientationChange();
             startCameraStream();
         }
 
@@ -593,11 +622,12 @@
             }
 
             try {
+                const isLandscape = window.innerWidth > window.innerHeight;
                 const constraints = {
                     video: { 
                         facingMode: useFrontCamera ? 'user' : 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        width: { ideal: isLandscape ? 1280 : 720 },
+                        height: { ideal: isLandscape ? 720 : 1280 }
                     }
                 };
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -627,9 +657,18 @@
             const canvas = document.getElementById('watermark-canvas');
             const ctx = canvas.getContext('2d');
 
-            // Dimensi Portrait standar 1280x720
-            canvas.width = 1280;
-            canvas.height = 720;
+            // Auto-detect orientasi kamera saat tombol foto ditekan
+            const videoWidth = video.videoWidth || 720;
+            const videoHeight = video.videoHeight || 1280;
+            const isLandscapeCapture = videoWidth > videoHeight || window.innerWidth > window.innerHeight;
+
+            if (isLandscapeCapture) {
+                canvas.width = 1280;
+                canvas.height = 720;
+            } else {
+                canvas.width = 720;
+                canvas.height = 1280;
+            }
 
             if (useFrontCamera) {
                 ctx.save();
@@ -651,8 +690,8 @@
 
             const finalizeWatermark = (linesText, isGpsActive, lat, lon) => {
                 ctx.textAlign = 'right';
-                const fontSize = 18;
-                const lineHeight = 26;
+                const fontSize = isLandscapeCapture ? 16 : 18;
+                const lineHeight = isLandscapeCapture ? 24 : 26;
                 ctx.font = `bold ${fontSize}px 'Droid Sans', sans-serif`;
 
                 let renderLines = [];
@@ -668,35 +707,27 @@
                 const xText = canvas.width - paddingRight;
                 const startY = canvas.height - paddingBottom - ((renderLines.length - 1) * lineHeight);
 
-                // Render setiap baris teks watermark dengan shadow presisi
                 renderLines.forEach((line, index) => {
                     const currentY = startY + (index * lineHeight);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
 
-                    // Garis waktu pertama diberi ikon pin 📍 di sampingnya jika GPS aktif
                     if (isGpsActive && index === 0) {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                        ctx.shadowBlur = 6;
-                        ctx.shadowOffsetX = 2;
-                        ctx.shadowOffsetY = 2;
                         ctx.fillText(`📍 ${line}`, xText, currentY);
                     } else {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                        ctx.shadowBlur = 6;
-                        ctx.shadowOffsetX = 2;
-                        ctx.shadowOffsetY = 2;
                         ctx.fillText(line, xText, currentY);
                     }
                 });
 
-                // Gambar Mini Map Kiri Bawah (Portrait Map Box)
-                const mapW = 230;
-                const mapH = 145;
+                // Mini Map Box (menyesuaikan ukuran portrait/landscape)
+                const mapW = isLandscapeCapture ? 210 : 170;
+                const mapH = isLandscapeCapture ? 130 : 170;
                 const mapX = 35;
                 const mapY = canvas.height - mapH - 35;
 
-                // Border & Shadow Box Mini Map
                 ctx.save();
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
                 ctx.shadowBlur = 12;
@@ -714,19 +745,14 @@
                         ctx.drawImage(mapImageObj, mapX + 3, mapY + 3, mapW - 6, mapH - 6);
                         ctx.restore();
                     } else {
-                        // Fallback grid peta mini jika gambar tile offline
                         ctx.fillStyle = '#cbd5e1';
                         ctx.fillRect(mapX + 3, mapY + 3, mapW - 6, mapH - 6);
                         ctx.fillStyle = '#0f172a';
                         ctx.font = 'bold 11px sans-serif';
                         ctx.textAlign = 'center';
                         ctx.fillText('MINI MAP GPS', mapX + mapW / 2, mapY + mapH / 2 - 5);
-                        ctx.font = '10px sans-serif';
-                        ctx.fillStyle = '#334155';
-                        ctx.fillText(`${lat.toFixed(4)}, ${lon.toFixed(4)}`, mapX + mapW / 2, mapY + mapH / 2 + 12);
                     }
 
-                    // Pin Marker Merah di tengah Mini Map
                     ctx.beginPath();
                     ctx.arc(mapX + mapW / 2, mapY + mapH / 2, 7, 0, 2 * Math.PI);
                     ctx.fillStyle = '#ef4444';
@@ -749,8 +775,7 @@
                     drawMapOverlay(null);
                 };
 
-                // Memuat gambar tile mini map statik berbasis koordinat
-                mapImg.src = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=15&size=230,145&l=map&pt=${lon},${lat},pm2rdm`;
+                mapImg.src = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=15&size=${mapW},${mapH}&l=map&pt=${lon},${lat},pm2rdm`;
             };
 
             if (navigator.geolocation) {
@@ -778,13 +803,11 @@
                         finalizeWatermark(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta'], true, lat, lon);
                     },
                     () => {
-                        // GPS Mati / Ditolak
                         finalizeWatermark([], false, -6.3218, 106.9036);
                     },
                     { timeout: 6000, enableHighAccuracy: true }
                 );
             } else {
-                // Browser Tidak Mendukung Geolocation
                 finalizeWatermark([], false, -6.3218, 106.9036);
             }
         }
@@ -871,7 +894,7 @@
                     `;
                 } else if (act.photoUrl) {
                     docContent = `
-                        <img src="${act.photoUrl}" alt="Dokumentasi" class="max-h-28 w-auto mx-auto object-contain rounded border border-slate-300">
+                        <img src="${act.photoUrl}" alt="Dokumentasi" class="max-h-36 w-auto mx-auto object-contain rounded border border-slate-300">
                     `;
                 } else {
                     docContent = `<span class="text-slate-400 italic text-center block">-</span>`;
