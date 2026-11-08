@@ -327,7 +327,7 @@
 
     </main>
 
-    <!-- Camera Modal Dialog (Landscape Aspect Ratio) -->
+    <!-- Camera Modal Dialog (Landscape Aspect Ratio 16:9) -->
     <div id="camera-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-xl max-w-xl w-full p-4 shadow-2xl relative space-y-3">
             <div class="flex justify-between items-center">
@@ -338,7 +338,6 @@
                     <i class="fas fa-sync-alt"></i> Ganti Kamera
                 </button>
             </div>
-            <!-- Posisi Video Landscape (16:9) -->
             <div class="relative bg-black rounded-lg overflow-hidden aspect-video flex items-center justify-center">
                 <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
                 <div id="camera-loading" class="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs">
@@ -594,7 +593,6 @@
             }
 
             try {
-                // Paksa resolusi video aspek rasio landscape 16:9
                 const constraints = {
                     video: { 
                         facingMode: useFrontCamera ? 'user' : 'environment',
@@ -629,7 +627,7 @@
             const canvas = document.getElementById('watermark-canvas');
             const ctx = canvas.getContext('2d');
 
-            // Set dimensi canvas landscape standar (1280x720)
+            // Dimensi landscape standar 1280x720
             canvas.width = 1280;
             canvas.height = 720;
 
@@ -650,103 +648,109 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            // Format Timestamp dengan simbol lokasi 📍 di samping tanggal
-            const dateTimeStr = `📍 ${day} ${month} ${year} ${hours}.${minutes}.${seconds}`;
 
-            const finalizeWatermark = (locationLines, lat, lon) => {
-                // 1. Gambar teks Kanan Bawah dengan font Droid Sans
+            const finalizeWatermark = (linesText, isGpsActive, lat, lon) => {
                 ctx.textAlign = 'right';
-                const fontSize = 16;
+                const fontSize = 18;
+                const lineHeight = 26;
                 ctx.font = `bold ${fontSize}px 'Droid Sans', sans-serif`;
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                ctx.shadowBlur = 6;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
 
-                const lines = [dateTimeStr, ...locationLines];
-                const lineHeight = fontSize + 8;
-                const paddingRight = 30;
-                const paddingBottom = 30;
+                let renderLines = [];
+                if (!isGpsActive) {
+                    renderLines = ["GPS sedang tidak aktif, atur kembali lokasi anda"];
+                } else {
+                    const timeLine = `${day} ${month} ${year} ${hours}.${minutes}.${seconds}`;
+                    renderLines = [timeLine, ...linesText];
+                }
+
+                const paddingRight = 35;
+                const paddingBottom = 35;
                 const xText = canvas.width - paddingRight;
-                let yText = canvas.height - paddingBottom - ((lines.length - 1) * lineHeight);
+                const startY = canvas.height - paddingBottom - ((renderLines.length - 1) * lineHeight);
 
-                lines.forEach((line, index) => {
-                    ctx.fillText(line, xText, yText + (index * lineHeight));
+                // Render setiap baris teks watermark dengan shadow presisi
+                renderLines.forEach((line, index) => {
+                    const currentY = startY + (index * lineHeight);
+
+                    // Garis waktu pertama diberi ikon pin 📍 di sampingnya jika GPS aktif
+                    if (isGpsActive && index === 0) {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                        ctx.shadowBlur = 6;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                        ctx.fillText(`📍 ${line}`, xText, currentY);
+                    } else {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                        ctx.shadowBlur = 6;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                        ctx.fillText(line, xText, currentY);
+                    }
                 });
 
-                // 2. Gambar Mini Maps di Pojok Kiri Bawah (Semi-transparan dan jelas)
-                const mapWidth = 220;
-                const mapHeight = 140;
-                const mapX = 30;
-                const mapY = canvas.height - mapHeight - 30;
+                // Gambar Mini Map Kiri Bawah (Landscape Map Box)
+                const mapW = 230;
+                const mapH = 145;
+                const mapX = 35;
+                const mapY = canvas.height - mapH - 35;
 
-                // Bingkai/Background Maps dengan efek transparansi (opacity 85%)
+                // Border & Shadow Box Mini Map
                 ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                ctx.shadowBlur = 10;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
-                ctx.fillRect(mapX, mapY, mapWidth, mapHeight);
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+                ctx.fillRect(mapX, mapY, mapW, mapH);
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 3;
-                ctx.strokeRect(mapX, mapY, mapWidth, mapHeight);
+                ctx.strokeRect(mapX, mapY, mapW, mapH);
                 ctx.restore();
 
-                // Ambil tile peta Statik dari OpenStreetMap (OSM Static / Static Map API alternatif via tile server)
-                // Menggunakan koordinat lat lon aktual atau default Bambu Apus (-6.3218, 106.9036)
-                const mapZoom = 15;
-                const mapImg = new Image();
-                mapImg.crossOrigin = "anonymous";
-                // Menggunakan layanan peta statik publik open source (Tile Render)
-                const tileUrl = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=${mapZoom}&size=${mapWidth},${mapHeight}&l=map&pt=${lon},${lat},pm2rdm`;
-                
-                // Fallback gambar peta jika gagal dimuat, buat gambar sketsa canvas peta mini
-                mapImg.onload = function() {
-                    ctx.save();
-                    ctx.globalAlpha = 0.85; // Opacity menyesuaikan agar peta tetap jelas terlihat
-                    ctx.drawImage(mapImg, mapX, mapY, mapWidth, mapHeight);
-                    ctx.restore();
+                const drawMapOverlay = (mapImageObj) => {
+                    if (mapImageObj) {
+                        ctx.save();
+                        ctx.globalAlpha = 0.9;
+                        ctx.drawImage(mapImageObj, mapX + 3, mapY + 3, mapW - 6, mapH - 6);
+                        ctx.restore();
+                    } else {
+                        // Fallback grid peta mini jika gambar tile offline
+                        ctx.fillStyle = '#cbd5e1';
+                        ctx.fillRect(mapX + 3, mapY + 3, mapW - 6, mapH - 6);
+                        ctx.fillStyle = '#0f172a';
+                        ctx.font = 'bold 11px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('MINI MAP GPS', mapX + mapW / 2, mapY + mapH / 2 - 5);
+                        ctx.font = '10px sans-serif';
+                        ctx.fillStyle = '#334155';
+                        ctx.fillText(`${lat.toFixed(4)}, ${lon.toFixed(4)}`, mapX + mapW / 2, mapY + mapH / 2 + 12);
+                    }
 
-                    // Pin merah penanda lokasi di tengah mini map
+                    // Pin Marker Merah di tengah Mini Map
                     ctx.beginPath();
-                    ctx.arc(mapX + mapWidth / 2, mapY + mapHeight / 2 - 10, 6, 0, 2 * Math.PI);
+                    ctx.arc(mapX + mapW / 2, mapY + mapH / 2, 7, 0, 2 * Math.PI);
                     ctx.fillStyle = '#ef4444';
                     ctx.fill();
                     ctx.lineWidth = 2;
                     ctx.strokeStyle = '#ffffff';
                     ctx.stroke();
 
-                    currentCapturedImage = canvas.toDataURL('image/jpeg', 0.9);
+                    currentCapturedImage = canvas.toDataURL('image/jpeg', 0.92);
                     showTempPreview(currentCapturedImage);
                     closeCameraModal();
                 };
 
+                const mapImg = new Image();
+                mapImg.crossOrigin = "anonymous";
+                mapImg.onload = function() {
+                    drawMapOverlay(mapImg);
+                };
                 mapImg.onerror = function() {
-                    // Jika gagal load API peta luar, gambar ilustrasi mini map lokal
-                    ctx.fillStyle = '#e2e8f0';
-                    ctx.fillRect(mapX + 5, mapY + 5, mapWidth - 10, mapHeight - 10);
-                    ctx.fillStyle = '#1e293b';
-                    ctx.font = 'bold 11px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('PETA LOKASI GPS', mapX + mapWidth / 2, mapY + mapHeight / 2 - 5);
-                    ctx.font = '9px sans-serif';
-                    ctx.fillStyle = '#475569';
-                    ctx.fillText(`${lat.toFixed(4)}, ${lon.toFixed(4)}`, mapX + mapWidth / 2, mapY + mapHeight / 2 + 12);
-
-                    // Pin Marker
-                    ctx.beginPath();
-                    ctx.arc(mapX + mapWidth / 2, mapY + mapHeight / 2 - 25, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#ef4444';
-                    ctx.fill();
-
-                    currentCapturedImage = canvas.toDataURL('image/jpeg', 0.9);
-                    showTempPreview(currentCapturedImage);
-                    closeCameraModal();
+                    drawMapOverlay(null);
                 };
 
-                // Load openstreetmap static tile or render fallback
-                mapImg.src = `https://oji.ovh/staticmap?center=${lat},${lon}&zoom=${mapZoom}&size=${mapWidth}x${mapHeight}&markers=${lat},${lon},red`;
+                // Memuat gambar tile mini map statik berbasis koordinat
+                mapImg.src = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=15&size=230,145&l=map&pt=${lon},${lat},pm2rdm`;
             };
 
             if (navigator.geolocation) {
@@ -765,22 +769,23 @@
                                 const district = addr.subdistrict || addr.district || 'Kecamatan Cipayung';
                                 const city = addr.city || addr.city_district || addr.county || 'Kota Jakarta Timur';
                                 const state = addr.state || 'Daerah Khusus Ibukota Jakarta';
-                                finalizeWatermark([village, district, city, state], lat, lon);
+                                finalizeWatermark([village, district, city, state], true, lat, lon);
                                 return;
                             }
                         } catch (e) {
                             console.error(e);
                         }
-                        finalizeWatermark(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta'], -6.3218, 106.9036);
+                        finalizeWatermark(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta'], true, lat, lon);
                     },
                     () => {
-                        // Jika GPS tidak aktif / izin ditolak
-                        finalizeWatermark(['GPS sedang tidak aktif, atur kembali lokasi anda'], -6.3218, 106.9036);
+                        // GPS Mati / Ditolak
+                        finalizeWatermark([], false, -6.3218, 106.9036);
                     },
-                    { timeout: 5000, enableHighAccuracy: true }
+                    { timeout: 6000, enableHighAccuracy: true }
                 );
             } else {
-                finalizeWatermark(['GPS sedang tidak aktif, atur kembali lokasi anda'], -6.3218, 106.9036);
+                // Browser Tidak Mendukung Geolocation
+                finalizeWatermark([], false, -6.3218, 106.9036);
             }
         }
 
