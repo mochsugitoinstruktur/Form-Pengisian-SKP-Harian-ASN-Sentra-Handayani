@@ -1,0 +1,19 @@
+{
+    "name": "skp-harian-sentra-handayani",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Aplikasi Laporan Kinerja Harian ASN Sentra Handayani Jakarta",
+    "scripts": {
+        "build:web": "node scripts/build-web.js",
+        "android:init": "npm run build:web && npx cap add android && node scripts/patch-android.js && npx @capacitor/assets generate --android && npx cap sync android",
+        "android:sync": "npm run build:web && npx cap sync android"
+    },
+    "dependencies": {
+        "@capacitor/android": "^7.0.0",
+        "@capacitor/core": "^7.0.0"
+    },
+    "devDependencies": {
+        "@capacitor/assets": "^3.0.5",
+        "@capacitor/cli": "^7.0.0"
+    }
+}

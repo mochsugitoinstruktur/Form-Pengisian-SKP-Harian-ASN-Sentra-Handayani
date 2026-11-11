@@ -1,0 +1,9 @@
+{
+    "appId": "id.go.kemensos.skpharian",
+    "appName": "SKP Harian ASN",
+    "webDir": "www",
+    "backgroundColor": "#f4f7fb",
+    "android": {
+        "allowMixedContent": false
+    }
+}

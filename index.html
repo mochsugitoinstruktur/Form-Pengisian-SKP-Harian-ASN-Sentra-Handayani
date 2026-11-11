@@ -3,963 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pengisian SKP Harian - Kementerian Sosial RI</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts Inter & Droid Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/droidsans" rel="stylesheet">
-    
-    <!-- HTML2PDF JS Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <meta name="theme-color" content="#0b2246">
+    <meta name="description" content="Aplikasi pengisian Laporan Kinerja Harian ASN Sentra Handayani Jakarta, Kementerian Sosial Republik Indonesia.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SKP Harian">
+    <title>Laporan Kinerja Harian ASN &middot; Sentra Handayani Jakarta</title>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
-        .droid-font {
-            font-family: 'Droid Sans', sans-serif !important;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* Standard A4 dimensions & printable page styling */
-        .a4-page {
-            width: 210mm;
-            height: 297mm;
-            max-height: 297mm;
-            padding: 10mm 15mm 8mm 15mm;
-            box-sizing: border-box;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            position: relative;
-            margin: 0 auto;
-            overflow: hidden;
-        }
-
-        .rendering-pdf {
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            width: 210mm !important;
-            height: 297mm !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
-            page-break-after: avoid !important;
-            page-break-before: avoid !important;
-            page-break-inside: avoid !important;
-        }
-
-        .rendering-pdf img#prev-logo-img {
-            max-height: 25mm !important;
-            width: auto !important;
-            object-fit: contain !important;
-        }
-
-        @media (max-width: 900px) {
-            .a4-page-container {
-                overflow-x: auto;
-            }
-            .a4-page {
-                min-width: 210mm;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
-    
-    <!-- Header App Bar -->
-    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 shadow overflow-hidden">
-                    <img id="kopLogo" src="Kementerian_Sosial.png" alt="Logo Kemensos" class="w-full h-full object-contain">
-                </div>
-                <div>
-                    <h1 class="font-bold text-base leading-tight">Pengisian SKP Harian</h1>
-                    <p class="text-xs text-blue-200">Kementerian Sosial Republik Indonesia</p>
-                </div>
+<body>
+
+    <!-- ===== Icon sprite ===== -->
+    <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <symbol id="i-badge" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.4"/><path d="M8 3v4M16 3v4"/><circle cx="12" cy="12.2" r="2.1"/><path d="M8.6 17.4c.6-1.5 1.9-2.3 3.4-2.3s2.8.8 3.4 2.3"/></symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8.5" y="3.5" width="7" height="3.5" rx="1.2"/><path d="M9.5 5.8H7a2 2 0 0 0-2 2v11.4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.8a2 2 0 0 0-2-2h-2.5"/><path d="M9 12h6M9 16h4"/></symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16.5V5"/><path d="m7 10 5-5 5 5"/><path d="M5 19.5h14"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11.5"/><path d="m7 11 5 5 5-5"/><path d="M5 19.5h14"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11.5A8 8 0 1 0 17.4 18"/><path d="M20 4.5v6h-6"/></symbol>
+        <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="m8.2 12.4 2.6 2.6 5-5.4"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.6 4.4 4.4L19 6.8"/></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 3.2 20h17.6L12 4Z"/><path d="M12 9.5V14"/><path d="M12 17h.01"/></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5"/><path d="M12 7.8h.01"/></symbol>
+        <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.2"/><circle cx="8.8" cy="10" r="1.7"/><path d="m4 18.5 5-4.6 3.4 3 3.1-2.6 4.5 4.2"/></symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h2.6l1.2-2.2h8.4l1.2 2.2H20a1.4 1.4 0 0 1 1.4 1.4v8.2A1.4 1.4 0 0 1 20 19.5H4a1.4 1.4 0 0 1-1.4-1.4v-8.2A1.4 1.4 0 0 1 4 8.5Z"/><circle cx="12" cy="13.6" r="3.3"/></symbol>
+        <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5Z"/><path d="M14 3.5v5h5"/><path d="M9 13h6M9 17h4"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+        <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4.2L19 9.2a2.15 2.15 0 0 0-3-3L5.2 17 4 20Z"/><path d="m13.6 6.8 3.1 3.1"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.8h5V7"/><path d="m6.2 7 .9 12.2a1.6 1.6 0 0 0 1.6 1.5h6.6a1.6 1.6 0 0 0 1.6-1.5L17.8 7"/><path d="M10.2 11v6M13.8 11v6"/></symbol>
+        <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></symbol>
+        <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m18 13-6 6-6-6"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.1 2"/></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.8 12S6.4 5.6 12 5.6 21.2 12 21.2 12 17.6 18.4 12 18.4 2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+        <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8.5V4h10v4.5"/><rect x="4" y="8.5" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></symbol>
+        <symbol id="i-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="m15.8 15.8 4.2 4.2"/><path d="M11 8.4v5.2M8.4 11h5.2"/></symbol>
+        <symbol id="i-zoom-out" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="m15.8 15.8 4.2 4.2"/><path d="M8.4 11h5.2"/></symbol>
+        <symbol id="i-switch" viewBox="0 0 24 24"><path d="M3.5 8.5h14l-3.2-3.2"/><path d="M20.5 15.5h-14l3.2 3.2"/></symbol>
+        <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="9.8" r="2.6"/></symbol>
+        <symbol id="i-gps" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.8"/><circle cx="12" cy="12" r="2.1"/><path d="M12 2.2v2.6M12 19.2v2.6M2.2 12h2.6M19.2 12h2.6"/></symbol>
+    </svg>
+
+    <!-- ===== App bar ===== -->
+    <header class="appbar">
+        <div class="appbar__inner">
+            <div class="brand">
+                <span class="brand__mark">
+                    <img src="Kementerian_Sosial.png" alt="Logo Kementerian Sosial Republik Indonesia">
+                </span>
+                <span class="brand__copy">
+                    <span class="brand__eyebrow">Kementerian Sosial Republik Indonesia</span>
+                    <span class="brand__title">Laporan Kinerja Harian ASN</span>
+                    <span class="brand__sub">Sentra Handayani Jakarta</span>
+                </span>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="resetForm()" class="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white font-medium rounded shadow transition">
-                    <i class="fas fa-undo mr-1"></i> Reset Data
+
+            <div class="appbar__side">
+                <span class="save-state" id="save-state" title="Data disimpan otomatis di peramban">
+                    <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
+                    <span id="save-state-text">Tersimpan otomatis</span>
+                </span>
+                <button type="button" class="btn btn--ghost btn--danger" id="btn-reset">
+                    <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+                    <span class="btn__label">Reset</span>
                 </button>
-                <button onclick="exportToPDF()" class="px-4 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded shadow transition flex items-center">
-                    <i class="fas fa-file-pdf text-sm mr-1.5"></i> Ekspor PDF (A4 Portrait)
+                <button type="button" class="btn btn--primary" id="btn-export">
+                    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+                    <span>Ekspor PDF</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Workspace -->
-    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Input Form Section (Left Column) -->
-        <section class="lg:col-span-5 space-y-5">
-            
-            <!-- Form Data Pegawai -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide border-b pb-2 mb-3 flex items-center">
-                    <i class="fas fa-id-card text-blue-600 mr-2"></i> Data Pegawai
-                </h2>
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="block font-medium text-slate-700 mb-1">Nama Pegawai</label>
-                        <input type="text" id="input-nama" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">NIP</label>
-                            <input type="text" id="input-nip" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">Pangkat / Gol.</label>
-                            <input type="text" id="input-pangkat" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">Jabatan</label>
-                            <input type="text" id="input-jabatan" oninput="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">Tanggal Kegiatan</label>
-                            <input type="date" id="input-tanggal" onchange="updatePreview()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
+    <!-- ===== Workspace ===== -->
+    <main class="workspace">
 
-                    <div>
-                        <label class="block font-medium text-slate-700 mb-1">Dibuat Di (Kota / Tempat)</label>
-                        <input type="text" id="input-tempat" oninput="updatePreview()" placeholder="Contoh: Jakarta" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
+        <!-- Editor -->
+        <section class="editor" aria-label="Formulir pengisian laporan">
 
-                    <!-- Upload / Gambar Tanda Tangan Pegawai -->
-                    <div>
-                        <label class="block font-medium text-slate-700 mb-1">Tanda Tangan Digital Pegawai</label>
-                        <div class="flex gap-2 items-center">
-                            <input type="file" id="input-ttd-file" accept="image/*" onchange="handleSignatureUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded">
-                            <button type="button" onclick="clearSignature()" class="px-2 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 text-xs font-semibold shrink-0">
-                                <i class="fas fa-trash"></i> Hapus
+            <div class="editor__head">
+                <h1>Formulir Laporan</h1>
+                <p>Lengkapi identitas pegawai, susun kegiatan harian, lalu unduh laporan resmi dalam format A4.</p>
+            </div>
+
+            <!-- Identitas -->
+            <article class="card">
+                <header class="card__head">
+                    <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-badge"></use></svg></span>
+                    <div class="card__heading">
+                        <h2>Identitas Pegawai</h2>
+                        <p>Data ini tercetak pada bagian kop laporan.</p>
+                    </div>
+                    <span class="card__step">01</span>
+                </header>
+
+                <div class="card__body">
+                    <div class="form-grid">
+                        <div class="field field--span-2">
+                            <label for="in-nama">Nama Pegawai</label>
+                            <input type="text" id="in-nama" autocomplete="name" placeholder="Nama lengkap beserta gelar">
+                        </div>
+
+                        <div class="field">
+                            <label for="in-nip">NIP</label>
+                            <input type="text" id="in-nip" inputmode="numeric" maxlength="18" placeholder="18 digit angka" autocomplete="off">
+                            <p class="field__hint" id="nip-hint">Contoh: 19920526 202506 1 002</p>
+                        </div>
+
+                        <div class="field">
+                            <label for="in-pangkat">Pangkat / Golongan</label>
+                            <input type="text" id="in-pangkat" placeholder="Contoh: Penata Muda (III/a)">
+                        </div>
+
+                        <div class="field">
+                            <label for="in-jabatan">Jabatan</label>
+                            <input type="text" id="in-jabatan" placeholder="Contoh: Instruktur Ahli Pertama">
+                        </div>
+
+                        <div class="field">
+                            <label for="in-tanggal">Tanggal Kegiatan</label>
+                            <input type="date" id="in-tanggal">
+                        </div>
+
+                        <div class="field">
+                            <label for="in-tempat">Dibuat di</label>
+                            <input type="text" id="in-tempat" placeholder="Contoh: Jakarta">
+                        </div>
+
+                        <div class="field field--span-2">
+                            <label for="sig-file">Tanda Tangan Digital</label>
+                            <input type="file" id="sig-file" accept="image/png,image/jpeg,image/webp" hidden>
+                            <div class="sig-upload" id="sig-upload">
+                                <button type="button" class="sig-upload__empty" id="sig-pick">
+                                    <span class="sig-upload__icon"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg></span>
+                                    <span class="sig-upload__text">
+                                        <strong>Unggah tanda tangan</strong>
+                                        <small>PNG transparan atau JPG, maksimal 5 MB</small>
+                                    </span>
+                                </button>
+                                <div class="sig-upload__filled" id="sig-preview" hidden>
+                                    <img id="sig-img" alt="Pratinjau tanda tangan pegawai">
+                                    <div class="sig-upload__meta">
+                                        <strong>Tanda tangan siap digunakan</strong>
+                                        <small>Ditampilkan pada blok tanda tangan laporan.</small>
+                                    </div>
+                                    <div class="sig-upload__actions">
+                                        <button type="button" class="btn btn--ghost btn--sm" id="sig-replace">Ganti</button>
+                                        <button type="button" class="icon-btn icon-btn--danger" id="sig-remove" aria-label="Hapus tanda tangan">
+                                            <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Kegiatan -->
+            <article class="card">
+                <header class="card__head">
+                    <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg></span>
+                    <div class="card__heading">
+                        <h2>Kegiatan Harian</h2>
+                        <p>Setiap kegiatan dilengkapi jam pelaksanaan dan dokumentasi.</p>
+                    </div>
+                    <span class="card__step">02</span>
+                </header>
+
+                <div class="card__body">
+                    <form id="activity-form" novalidate>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="act-mulai">Jam Mulai</label>
+                                <input type="time" id="act-mulai" required>
+                            </div>
+                            <div class="field">
+                                <label for="act-selesai">Jam Selesai</label>
+                                <input type="time" id="act-selesai" required>
+                            </div>
+
+                            <div class="field field--span-2" id="time-error" hidden>
+                                <p class="field__error"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span id="time-error-text">Jam selesai harus lebih lambat dari jam mulai.</span></p>
+                            </div>
+
+                            <div class="field field--span-2">
+                                <div class="field__label-row">
+                                    <label for="act-deskripsi">Uraian Kegiatan</label>
+                                    <span class="char-count" id="desc-count">0 / 500</span>
+                                </div>
+                                <textarea id="act-deskripsi" rows="3" maxlength="500" placeholder="Contoh: Mengikuti rapat koordinasi pokja di Sentra Handayani 2."></textarea>
+                            </div>
+
+                            <div class="field field--span-2">
+                                <label>Dokumentasi</label>
+                                <div class="segmented" role="radiogroup" aria-label="Jenis dokumentasi">
+                                    <label class="segmented__item is-active" data-type="photo">
+                                        <input type="radio" name="doc-type" value="photo" checked>
+                                        <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
+                                        <span>Foto</span>
+                                    </label>
+                                    <label class="segmented__item" data-type="camera">
+                                        <input type="radio" name="doc-type" value="camera">
+                                        <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+                                        <span>Kamera GPS</span>
+                                    </label>
+                                    <label class="segmented__item" data-type="document">
+                                        <input type="radio" name="doc-type" value="document">
+                                        <svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg>
+                                        <span>Dokumen</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="field field--span-2 doc-panel" id="panel-photo">
+                                <div class="dropzone" data-dropzone="photo" tabindex="0" role="button" aria-label="Unggah foto dokumentasi">
+                                    <input type="file" id="photo-file" accept="image/*" hidden>
+                                    <span class="dropzone__icon"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></span>
+                                    <span class="dropzone__text">
+                                        <strong>Letakkan foto di sini atau klik untuk memilih</strong>
+                                        <small>JPG, PNG, WEBP &middot; otomatis dikompres</small>
+                                    </span>
+                                </div>
+                                <div class="url-field">
+                                    <span class="url-field__divider">atau</span>
+                                    <input type="url" id="photo-url" placeholder="Tempel URL gambar (https://...)">
+                                </div>
+                            </div>
+
+                            <div class="field field--span-2 doc-panel" id="panel-camera" hidden>
+                                <div class="camera-cta">
+                                    <span class="camera-cta__icon"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg></span>
+                                    <div class="camera-cta__text">
+                                        <strong>Ambil foto langsung dari kamera</strong>
+                                        <small>Waktu, lokasi GPS, dan peta mini dicetak otomatis pada foto.</small>
+                                    </div>
+                                    <button type="button" class="btn btn--ghost btn--sm" id="btn-open-camera">
+                                        <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+                                        Buka Kamera
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="field field--span-2 doc-panel" id="panel-document" hidden>
+                                <div class="dropzone" data-dropzone="document" tabindex="0" role="button" aria-label="Unggah dokumen lampiran">
+                                    <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden>
+                                    <span class="dropzone__icon"><svg class="icon" aria-hidden="true"><use href="#i-file"></use></svg></span>
+                                    <span class="dropzone__text">
+                                        <strong>Klik untuk memilih lampiran</strong>
+                                        <small>PDF, Word, JPG, atau PNG &middot; maksimal 10 MB</small>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field field--span-2">
+                                <div class="attachment" id="attachment" hidden>
+                                    <div class="attachment__thumb" id="attach-thumb"></div>
+                                    <div class="attachment__meta">
+                                        <strong id="attach-name">-</strong>
+                                        <small id="attach-meta">-</small>
+                                    </div>
+                                    <button type="button" class="icon-btn icon-btn--danger" id="attach-remove" aria-label="Hapus lampiran">
+                                        <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="field field--span-2">
+                                <p class="field__error" id="form-error" hidden></p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn--ghost" id="btn-cancel-edit" hidden>
+                                <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+                                Batal
+                            </button>
+                            <button type="submit" class="btn btn--primary btn--block" id="btn-add">
+                                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                                <span id="btn-add-label">Tambah ke Laporan</span>
                             </button>
                         </div>
+                    </form>
+
+                    <div class="list-head">
+                        <div>
+                            <h3>Daftar Kegiatan</h3>
+                            <p id="list-summary">Belum ada kegiatan</p>
+                        </div>
+                        <span class="chip" id="activity-count">0 kegiatan</span>
+                    </div>
+
+                    <div class="activity-list" id="activity-list"></div>
+
+                    <div class="empty-state" id="activity-empty">
+                        <span class="empty-state__icon"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg></span>
+                        <strong>Belum ada kegiatan</strong>
+                        <p>Kegiatan yang Anda tambahkan akan tampil di sini dan langsung masuk ke pratinjau laporan.</p>
                     </div>
                 </div>
-            </div>
+            </article>
+        </section>
 
-            <!-- Form Tambah Kegiatan Harian -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide border-b pb-2 mb-3 flex items-center justify-between">
-                    <span><i class="fas fa-tasks text-blue-600 mr-2"></i> Input Kegiatan Harian</span>
-                    <span id="activity-count-badge" class="bg-blue-100 text-blue-800 text-[10px] font-semibold px-2 py-0.5 rounded-full">0 Kegiatan</span>
-                </h2>
-                
-                <form id="activity-form" onsubmit="addActivity(event)" class="space-y-3 text-xs">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">Jam Mulai</label>
-                            <input type="time" id="act-jam-mulai" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">Jam Selesai</label>
-                            <input type="time" id="act-jam-selesai" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
+        <!-- Preview -->
+        <section class="preview" aria-label="Pratinjau dokumen">
+            <div class="preview__bar">
+                <div class="preview__title">
+                    <span class="preview__icon"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></span>
                     <div>
-                        <label class="block font-medium text-slate-700 mb-1">Uraian / Deskripsi Kegiatan</label>
-                        <textarea id="act-deskripsi" rows="2" required placeholder="Contoh: Mengikuti rapat keanggotaan pokja..." class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        <strong>Pratinjau Dokumen</strong>
+                        <span>A4 &middot; 210 &times; 297 mm &middot; diperbarui otomatis</span>
                     </div>
-                    
-                    <div>
-                        <label class="block font-medium text-slate-700 mb-1">Opsi Dokumentasi</label>
-                        <select id="act-doc-type" onchange="toggleDocInputType()" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-                            <option value="photo">Foto Dokumentasi Kegiatan</option>
-                            <option value="camera">Ambil Foto Kamera Auto-Rotate (GPS & Maps)</option>
-                            <option value="document">Upload Dokumen Lampiran (Maks 10MB)</option>
-                        </select>
-                    </div>
-
-                    <div id="container-photo-input" class="space-y-2">
-                        <label class="block font-medium text-slate-700">Upload Foto Dokumentasi</label>
-                        <input type="file" id="act-photo-file" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded">
-                        <input type="url" id="act-photo-url" placeholder="atau Masukkan URL Gambar (https://...)" class="w-full p-2 border border-slate-300 rounded outline-none text-xs">
-                    </div>
-
-                    <div id="container-camera-input" class="hidden">
-                        <button type="button" onclick="openCameraModal()" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold rounded hover:bg-indigo-100 transition flex items-center justify-center gap-2">
-                            <i class="fas fa-camera"></i> Buka Kamera Auto-Rotate (GPS Maps)
+                </div>
+                <div class="preview__tools">
+                    <span class="chip chip--quiet" id="page-count">1 halaman</span>
+                    <div class="zoom">
+                        <button type="button" class="zoom__btn" id="zoom-out" aria-label="Perkecil pratinjau">
+                            <svg class="icon" aria-hidden="true"><use href="#i-zoom-out"></use></svg>
+                        </button>
+                        <button type="button" class="zoom__btn zoom__btn--level" id="zoom-fit" title="Sesuaikan dengan lebar panel">100%</button>
+                        <button type="button" class="zoom__btn" id="zoom-in" aria-label="Perbesar pratinjau">
+                            <svg class="icon" aria-hidden="true"><use href="#i-zoom-in"></use></svg>
                         </button>
                     </div>
-
-                    <div id="container-document-input" class="hidden space-y-1">
-                        <label class="block font-medium text-slate-700">Pilih Berkas Dokumen (Maks. 10MB)</label>
-                        <input type="file" id="act-doc-file" accept=".pdf,.doc,.docx,.jpg,.png" onchange="handleDocUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 border border-slate-300 rounded">
-                        <p class="text-[10px] text-slate-500">Format didukung: PDF, Word, JPG, PNG.</p>
-                    </div>
-
-                    <div id="photo-preview-box" class="hidden relative rounded border border-slate-200 bg-slate-50 p-2 text-center">
-                        <img id="temp-img-preview" src="" alt="Pratinjau Foto" class="max-h-32 mx-auto rounded object-contain">
-                        <div id="temp-doc-info" class="hidden text-xs text-slate-700 font-medium py-2">
-                            <i class="fas fa-file-pdf text-red-500 text-lg block mb-1"></i>
-                            <span id="temp-doc-name" class="block truncate"></span>
-                        </div>
-                        <button type="button" onclick="clearTempImage()" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition flex items-center justify-center gap-1 shadow">
-                        <i class="fas fa-plus"></i> Tambah Kegiatan Ke Laporan
+                    <button type="button" class="btn btn--ghost btn--sm" id="btn-print">
+                        <svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg>
+                        <span class="btn__label">Cetak</span>
                     </button>
-                </form>
-
-                <div class="mt-4 border-t pt-3">
-                    <h3 class="font-bold text-xs text-slate-700 mb-2">Daftar Kegiatan Yang Ditambahkan:</h3>
-                    <div id="activity-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
-        </section>
-
-        <!-- PDF Document Live Preview (Right Column) -->
-        <section class="lg:col-span-7 flex flex-col items-center">
-            <div class="w-full flex justify-between items-center mb-2 px-1 max-w-[210mm]">
-                <span class="text-xs font-semibold text-slate-600"><i class="fas fa-eye mr-1"></i> Pratinjau Dokumen PDF (A4 Portrait)</span>
-                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">Otomatis Terperbarui</span>
-            </div>
-
-            <!-- PDF Page Wrapper -->
-            <div class="a4-page-container w-full flex justify-center overflow-x-auto pb-4">
-                <div id="pdf-content" class="a4-page bg-white shadow-xl rounded border border-slate-300 text-[9.5pt] leading-relaxed font-sans">
-                    
-                    <div class="w-full flex-grow flex flex-col">
-                        
-                        <!-- Official Letterhead Header -->
-                        <div class="flex items-center pb-3 border-b-[3px] border-slate-900 mb-3 gap-4">
-                            <div class="w-24 flex-shrink-0 flex justify-center items-center">
-                                <img id="prev-logo-img" src="Kementerian_Sosial.png" alt="Logo Kemensos" crossorigin="anonymous" class="max-h-24 w-auto object-contain">
-                            </div>
-                            
-                            <div class="flex-grow text-center pr-6">
-                                <h2 class="font-bold text-[11pt] tracking-wider text-slate-900 uppercase">
-                                    LAPORAN KINERJA HARIAN ASN TAHUN <span id="prev-tahun">2026</span>
-                                </h2>
-                                <h3 class="font-extrabold text-[13pt] tracking-wide text-slate-900 uppercase my-0.5">
-                                    KEMENTERIAN SOSIAL
-                                </h3>
-                                <h1 class="font-extrabold text-[14pt] text-slate-900 uppercase tracking-tight my-0.5">
-                                    SENTRA HANDAYANI DI JAKARTA
-                                </h1>
-                                <p class="text-[8pt] font-medium text-slate-700 mt-0.5 tracking-wide">
-                                    Jl. PPA No.1 RT/RW 006/001, Bambu Apus, Kec. Cipayung, Kota Jakarta Timur, DKI Jakarta 13890
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Employee Info Table -->
-                        <table class="w-full text-[8.5pt] mb-3 border-collapse">
-                            <tr>
-                                <td class="w-32 py-0.5 font-medium text-slate-800">Nama Pegawai</td>
-                                <td class="w-3 py-0.5 text-center">:</td>
-                                <td id="prev-nama" class="py-0.5 font-semibold text-slate-900">Moch. Sugito S.T.</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5 font-medium text-slate-800">NIP</td>
-                                <td class="py-0.5 text-center">:</td>
-                                <td id="prev-nip" class="py-0.5 text-slate-900">199205262025061002</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5 font-medium text-slate-800">Jabatan</td>
-                                <td class="py-0.5 text-center">:</td>
-                                <td id="prev-jabatan" class="py-0.5 text-slate-900">Instruktur Ahli Pertama</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5 font-medium text-slate-800">Pangkat</td>
-                                <td class="py-0.5 text-center">:</td>
-                                <td id="prev-pangkat" class="py-0.5 text-slate-900">Penata Muda</td>
-                            </tr>
-                            <tr>
-                                <td class="py-0.5 font-medium text-slate-800">Tanggal Kegiatan</td>
-                                <td class="py-0.5 text-center">:</td>
-                                <td id="prev-tanggal" class="py-0.5 text-slate-900">03 Agustus 2026</td>
-                            </tr>
-                        </table>
-
-                        <!-- Activity Table -->
-                        <div class="w-full">
-                            <table class="w-full border-collapse border border-slate-900 text-[8.5pt]">
-                                <thead>
-                                    <tr class="bg-slate-100 text-center font-bold text-slate-900">
-                                        <th class="border border-slate-900 p-1.5 w-10 text-center">No</th>
-                                        <th class="border border-slate-900 p-1.5 text-center">Tugas dan Kegiatan</th>
-                                        <th class="border border-slate-900 p-1.5 w-48 text-center">Dokumentasi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="prev-activity-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Right Signature Block -->
-                    <div class="w-full flex justify-end mt-4 pt-2 text-[9pt]">
-                        <div class="text-center w-64 flex flex-col items-center leading-snug">
-                            <p id="prev-tgl-surat" class="text-center w-full">Dibuat di Jakarta<br>pada tanggal 03 Agustus 2026</p>
-                            <p id="prev-jabatan-ttd" class="font-bold text-slate-900 mt-1">Instruktur Ahli Pertama</p>
-                            
-                            <div class="h-16 w-full flex items-center justify-center relative my-1">
-                                <img id="prev-ttd-img" src="" alt="Tanda Tangan" class="max-h-16 w-auto object-contain hidden">
-                            </div>
-
-                            <p id="prev-nama-ttd" class="font-bold uppercase text-slate-900 underline tracking-wide">MOCH. SUGITO S.T.</p>
-                            <p id="prev-nip-ttd" class="text-slate-900">NIP.199205262025061002</p>
-                        </div>
-                    </div>
-
+            <div class="preview__viewport" id="preview-viewport">
+                <div class="preview__stage" id="preview-stage">
+                    <div class="document" id="document-pages"></div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- Camera Modal Dialog (Auto-Rotate Aspect Ratio) -->
-    <div id="camera-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl max-w-md w-full p-4 shadow-2xl relative space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-sm text-slate-800 flex items-center">
-                    <i class="fas fa-camera text-blue-600 mr-2"></i> Kamera Auto-Rotate (GPS & Maps)
-                </h3>
-                <button type="button" onclick="switchCamera()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded font-medium flex items-center gap-1.5 transition">
-                    <i class="fas fa-sync-alt"></i> Ganti Kamera
-                </button>
+    <footer class="site-foot">
+        <span>Aplikasi internal Sentra Handayani Jakarta &middot; Kementerian Sosial RI</span>
+        <span>Data tersimpan lokal pada peramban Anda</span>
+    </footer>
+
+    <!-- ===== Toasts ===== -->
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- ===== Confirm dialog ===== -->
+    <dialog class="dialog" id="confirm-dialog">
+        <form method="dialog" class="dialog__form">
+            <span class="dialog__icon" id="confirm-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg></span>
+            <h2 id="confirm-title">Reset data laporan?</h2>
+            <p id="confirm-message">Seluruh identitas, tanda tangan, dan daftar kegiatan akan dihapus dari peramban ini.</p>
+            <div class="dialog__actions">
+                <button type="submit" value="cancel" class="btn btn--ghost" id="confirm-cancel">Batal</button>
+                <button type="submit" value="ok" class="btn btn--danger-solid" id="confirm-ok">Ya, reset</button>
             </div>
-            
-            <div id="camera-container-box" class="relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-[3/4]">
-                <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover"></video>
-                <div id="camera-loading" class="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs">
-                    Memuat kamera & mendeteksi orientasi...
+        </form>
+    </dialog>
+
+    <!-- ===== Camera modal ===== -->
+    <div class="modal" id="camera-modal" role="dialog" aria-modal="true" aria-labelledby="camera-title" hidden>
+        <div class="camera-card">
+            <header class="camera-card__head">
+                <div>
+                    <h2 id="camera-title"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg> Kamera Dokumentasi</h2>
+                    <p>Foto diberi keterangan waktu, lokasi, dan peta mini secara otomatis.</p>
+                </div>
+                <button type="button" class="icon-btn" id="camera-close" aria-label="Tutup kamera">
+                    <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+                </button>
+            </header>
+
+            <div class="camera-frame" id="camera-frame">
+                <video id="camera-video" autoplay playsinline muted></video>
+                <div class="camera-frame__hud">
+                    <span class="hud-chip" id="camera-orientation"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg> Menyiapkan kamera</span>
+                    <span class="hud-chip" id="camera-gps"><svg class="icon" aria-hidden="true"><use href="#i-gps"></use></svg> Mendeteksi lokasi</span>
+                </div>
+                <div class="camera-frame__loading" id="camera-loading">
+                    <span class="spinner"></span>
+                    <span id="camera-loading-text">Menyalakan kamera&hellip;</span>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center text-xs text-slate-500 px-1">
-                <span id="orientation-status"><i class="fas fa-mobile-alt mr-1"></i> Orientasi: Otomatis</span>
-                <span>Putar HP untuk ubah Portrait/Landscape</span>
-            </div>
+            <p class="camera-error" id="camera-error" hidden></p>
 
-            <div class="flex gap-2 justify-end">
-                <button type="button" onclick="closeCameraModal()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs rounded font-medium">Batal</button>
-                <button type="button" onclick="captureCameraPhoto()" class="px-4 py-1.5 bg-blue-600 text-white text-xs rounded font-semibold flex items-center gap-1">
-                    <i class="fas fa-circle text-[10px]"></i> Ambil Foto
+            <div class="camera-card__foot">
+                <button type="button" class="btn btn--ghost" id="camera-switch">
+                    <svg class="icon" aria-hidden="true"><use href="#i-switch"></use></svg>
+                    Ganti Kamera
+                </button>
+                <button type="button" class="shutter" id="camera-capture" aria-label="Ambil foto">
+                    <span class="shutter__ring"><span class="shutter__dot"></span></span>
+                    <span>Ambil Foto</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <canvas id="watermark-canvas" class="hidden"></canvas>
-
-    <script>
-        const STORAGE_KEY = 'SKP_KEMENSOS_DATA_STORAGE';
-        const DEFAULT_LOGO = "Kementerian_Sosial.png";
-
-        const defaultData = {
-            nama: "Moch. Sugito S.T.",
-            nip: "199205262025061002",
-            jabatan: "Instruktur Ahli Pertama",
-            pangkat: "Penata Muda",
-            tanggal: "2026-08-03",
-            tempat: "Jakarta",
-            logoUrl: DEFAULT_LOGO,
-            signatureUrl: "",
-            kegiatan: [
-                {
-                    id: '1',
-                    jamMulai: '07:30',
-                    jamSelesai: '12:30',
-                    deskripsi: 'Mengikuti rapat keanggotaan pokja di sentra handayani 2',
-                    type: 'photo',
-                    photoUrl: 'https://placehold.co/400x300/cbd5e1/475569?text=Dokumentasi+Rapat'
-                },
-                {
-                    id: '2',
-                    jamMulai: '13:00',
-                    jamSelesai: '18:00',
-                    deskripsi: 'Bertugas sebagai admin wa center konsultasi bantuan sosial',
-                    type: 'photo',
-                    photoUrl: 'https://placehold.co/400x300/e2e8f0/334155?text=Dokumentasi+WA+Center'
-                }
-            ]
-        };
-
-        let appData = { ...defaultData };
-        let currentCapturedImage = '';
-        let mediaStream = null;
-        let useFrontCamera = true;
-
-        function initApp() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    appData = JSON.parse(saved);
-                } catch (e) {
-                    appData = { ...defaultData };
-                }
-            }
-            appData.logoUrl = DEFAULT_LOGO;
-            populateFormInputs();
-            preloadLocalLogo();
-            
-            // Listener untuk mendeteksi perubahan orientasi perangkat secara real-time
-            window.addEventListener('resize', handleOrientationChange);
-            window.addEventListener('orientationchange', handleOrientationChange);
-        }
-
-        function handleOrientationChange() {
-            const videoBox = document.getElementById('camera-container-box');
-            const statusText = document.getElementById('orientation-status');
-            const video = document.getElementById('webcam-video');
-            if (!videoBox || !video) return;
-
-            const isLandscape = window.innerWidth > window.innerHeight || (screen.orientation && screen.orientation.type.includes('landscape'));
-            
-            if (isLandscape) {
-                videoBox.className = "relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-video w-full max-h-[50vh]";
-                if(statusText) statusText.innerHTML = '<i class="fas fa-tablet-alt mr-1"></i> Orientasi: Landscape';
-            } else {
-                videoBox.className = "relative bg-black rounded-lg overflow-hidden flex items-center justify-center mx-auto transition-all duration-300 aspect-[3/4] w-3/4 max-h-[55vh]";
-                if(statusText) statusText.innerHTML = '<i class="fas fa-mobile-alt mr-1"></i> Orientasi: Portrait';
-            }
-        }
-
-        function preloadLocalLogo() {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const dataURL = canvas.toDataURL('image/png');
-                appData.logoUrl = dataURL;
-                updatePreview();
-            };
-            img.onerror = function() {
-                appData.logoUrl = DEFAULT_LOGO;
-                updatePreview();
-            };
-            img.src = DEFAULT_LOGO;
-        }
-
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-        }
-
-        function populateFormInputs() {
-            document.getElementById('input-nama').value = appData.nama || '';
-            document.getElementById('input-nip').value = appData.nip || '';
-            document.getElementById('input-jabatan').value = appData.jabatan || '';
-            document.getElementById('input-pangkat').value = appData.pangkat || '';
-            document.getElementById('input-tanggal').value = appData.tanggal || '2026-08-03';
-            document.getElementById('input-tempat').value = appData.tempat || 'Jakarta';
-        }
-
-        function handleSignatureUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    appData.signatureUrl = e.target.result;
-                    updatePreview();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearSignature() {
-            appData.signatureUrl = "";
-            document.getElementById('input-ttd-file').value = '';
-            updatePreview();
-        }
-
-        function updatePreview() {
-            appData.nama = document.getElementById('input-nama').value;
-            appData.nip = document.getElementById('input-nip').value;
-            appData.jabatan = document.getElementById('input-jabatan').value;
-            appData.pangkat = document.getElementById('input-pangkat').value;
-            appData.tanggal = document.getElementById('input-tanggal').value;
-            appData.tempat = document.getElementById('input-tempat').value || 'Jakarta';
-
-            document.getElementById('prev-nama').innerText = appData.nama || '-';
-            document.getElementById('prev-nip').innerText = appData.nip || '-';
-            document.getElementById('prev-jabatan').innerText = appData.jabatan || '-';
-            document.getElementById('prev-pangkat').innerText = appData.pangkat || '-';
-
-            const formattedDate = formatDate(appData.tanggal);
-            const yearStr = appData.tanggal ? new Date(appData.tanggal).getFullYear() : '2026';
-            
-            document.getElementById('prev-tanggal').innerText = formattedDate;
-            document.getElementById('prev-tahun').innerText = yearStr;
-
-            document.getElementById('prev-tgl-surat').innerHTML = `Dibuat di ${appData.tempat}<br>pada tanggal ${formattedDate}`;
-            document.getElementById('prev-jabatan-ttd').innerText = appData.jabatan || 'Instruktur Ahli Pertama';
-            document.getElementById('prev-nama-ttd').innerText = appData.nama || 'MOCH. SUGITO S.T.';
-            document.getElementById('prev-nip-ttd').innerText = `NIP.${appData.nip || ''}`;
-            
-            const logoImg = document.getElementById('prev-logo-img');
-            logoImg.src = appData.logoUrl || DEFAULT_LOGO;
-
-            const kopLogoHeader = document.getElementById('kopLogo');
-            if(kopLogoHeader) kopLogoHeader.src = appData.logoUrl || DEFAULT_LOGO;
-
-            const ttdImg = document.getElementById('prev-ttd-img');
-            if (appData.signatureUrl) {
-                ttdImg.src = appData.signatureUrl;
-                ttdImg.classList.remove('hidden');
-            } else {
-                ttdImg.classList.add('hidden');
-            }
-
-            renderActivities();
-            saveToStorage();
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '03 Agustus 2026';
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const d = new Date(dateString);
-            if (isNaN(d.getTime())) return dateString;
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = months[d.getMonth()];
-            const year = d.getFullYear();
-            return `${day} ${month} ${year}`;
-        }
-
-        function toggleDocInputType() {
-            const type = document.getElementById('act-doc-type').value;
-            document.getElementById('container-photo-input').classList.toggle('hidden', type !== 'photo');
-            document.getElementById('container-camera-input').classList.toggle('hidden', type !== 'camera');
-            document.getElementById('container-document-input').classList.toggle('hidden', type !== 'document');
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentCapturedImage = e.target.result;
-                    showTempPreview(currentCapturedImage);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handleDocUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 10 * 1024 * 1024) {
-                alert('Ukuran berkas melebihi batas maksimal 10MB!');
-                event.target.value = '';
-                return;
-            }
-            
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentCapturedImage = e.target.result;
-                    showTempPreview(currentCapturedImage);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                currentCapturedImage = {
-                    fileName: file.name,
-                    fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB'
-                };
-                document.getElementById('photo-preview-box').classList.remove('hidden');
-                document.getElementById('temp-img-preview').classList.add('hidden');
-                document.getElementById('temp-doc-info').classList.remove('hidden');
-                document.getElementById('temp-doc-name').innerText = file.name;
-            }
-        }
-
-        function showTempPreview(imgSrc) {
-            const previewBox = document.getElementById('photo-preview-box');
-            const imgElem = document.getElementById('temp-img-preview');
-            const docInfo = document.getElementById('temp-doc-info');
-            
-            imgElem.src = imgSrc;
-            imgElem.classList.remove('hidden');
-            docInfo.classList.add('hidden');
-            previewBox.classList.remove('hidden');
-        }
-
-        function clearTempImage() {
-            currentCapturedImage = '';
-            document.getElementById('act-photo-file').value = '';
-            document.getElementById('act-photo-url').value = '';
-            document.getElementById('act-doc-file').value = '';
-            document.getElementById('photo-preview-box').classList.add('hidden');
-        }
-
-        async function openCameraModal() {
-            const modal = document.getElementById('camera-modal');
-            modal.classList.remove('hidden');
-            handleOrientationChange();
-            startCameraStream();
-        }
-
-        async function startCameraStream() {
-            const video = document.getElementById('webcam-video');
-            const loading = document.getElementById('camera-loading');
-            loading.classList.remove('hidden');
-
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
-
-            try {
-                const isLandscape = window.innerWidth > window.innerHeight;
-                const constraints = {
-                    video: { 
-                        facingMode: useFrontCamera ? 'user' : 'environment',
-                        width: { ideal: isLandscape ? 1280 : 720 },
-                        height: { ideal: isLandscape ? 720 : 1280 }
-                    }
-                };
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = mediaStream;
-                loading.classList.add('hidden');
-            } catch (err) {
-                alert('Gagal mengakses kamera: ' + err.message);
-                closeCameraModal();
-            }
-        }
-
-        function switchCamera() {
-            useFrontCamera = !useFrontCamera;
-            startCameraStream();
-        }
-
-        function closeCameraModal() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-            }
-            document.getElementById('camera-modal').classList.add('hidden');
-        }
-
-        function captureCameraPhoto() {
-            const video = document.getElementById('webcam-video');
-            const canvas = document.getElementById('watermark-canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Auto-detect orientasi kamera saat tombol foto ditekan
-            const videoWidth = video.videoWidth || 720;
-            const videoHeight = video.videoHeight || 1280;
-            const isLandscapeCapture = videoWidth > videoHeight || window.innerWidth > window.innerHeight;
-
-            if (isLandscapeCapture) {
-                canvas.width = 1280;
-                canvas.height = 720;
-            } else {
-                canvas.width = 720;
-                canvas.height = 1280;
-            }
-
-            if (useFrontCamera) {
-                ctx.save();
-                ctx.scale(-1, 1);
-                ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-                ctx.restore();
-            } else {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            }
-
-            const now = new Date();
-            const day = now.getDate();
-            const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const month = monthsEn[now.getMonth()];
-            const year = now.getFullYear();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const finalizeWatermark = (linesText, isGpsActive, lat, lon) => {
-                ctx.textAlign = 'right';
-                const fontSize = isLandscapeCapture ? 16 : 18;
-                const lineHeight = isLandscapeCapture ? 24 : 26;
-                ctx.font = `bold ${fontSize}px 'Droid Sans', sans-serif`;
-
-                let renderLines = [];
-                if (!isGpsActive) {
-                    renderLines = ["GPS sedang tidak aktif, atur kembali lokasi anda"];
-                } else {
-                    const timeLine = `${day} ${month} ${year} ${hours}.${minutes}.${seconds}`;
-                    renderLines = [timeLine, ...linesText];
-                }
-
-                const paddingRight = 35;
-                const paddingBottom = 35;
-                const xText = canvas.width - paddingRight;
-                const startY = canvas.height - paddingBottom - ((renderLines.length - 1) * lineHeight);
-
-                renderLines.forEach((line, index) => {
-                    const currentY = startY + (index * lineHeight);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                    ctx.shadowBlur = 6;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-
-                    if (isGpsActive && index === 0) {
-                        ctx.fillText(`📍 ${line}`, xText, currentY);
-                    } else {
-                        ctx.fillText(line, xText, currentY);
-                    }
-                });
-
-                // Mini Map Box (menyesuaikan ukuran portrait/landscape)
-                const mapW = isLandscapeCapture ? 210 : 170;
-                const mapH = isLandscapeCapture ? 130 : 170;
-                const mapX = 35;
-                const mapY = canvas.height - mapH - 35;
-
-                ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                ctx.shadowBlur = 12;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-                ctx.fillRect(mapX, mapY, mapW, mapH);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(mapX, mapY, mapW, mapH);
-                ctx.restore();
-
-                const drawMapOverlay = (mapImageObj) => {
-                    if (mapImageObj) {
-                        ctx.save();
-                        ctx.globalAlpha = 0.9;
-                        ctx.drawImage(mapImageObj, mapX + 3, mapY + 3, mapW - 6, mapH - 6);
-                        ctx.restore();
-                    } else {
-                        ctx.fillStyle = '#cbd5e1';
-                        ctx.fillRect(mapX + 3, mapY + 3, mapW - 6, mapH - 6);
-                        ctx.fillStyle = '#0f172a';
-                        ctx.font = 'bold 11px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('MINI MAP GPS', mapX + mapW / 2, mapY + mapH / 2 - 5);
-                    }
-
-                    ctx.beginPath();
-                    ctx.arc(mapX + mapW / 2, mapY + mapH / 2, 7, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#ef4444';
-                    ctx.fill();
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.stroke();
-
-                    currentCapturedImage = canvas.toDataURL('image/jpeg', 0.92);
-                    showTempPreview(currentCapturedImage);
-                    closeCameraModal();
-                };
-
-                const mapImg = new Image();
-                mapImg.crossOrigin = "anonymous";
-                mapImg.onload = function() {
-                    drawMapOverlay(mapImg);
-                };
-                mapImg.onerror = function() {
-                    drawMapOverlay(null);
-                };
-
-                mapImg.src = `https://static-maps.yandex.ru/1.x/?ll=${lon},${lat}&z=15&size=${mapW},${mapH}&l=map&pt=${lon},${lat},pm2rdm`;
-            };
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (pos) => {
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
-                        try {
-                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
-                                headers: { 'Accept-Language': 'id' }
-                            });
-                            const data = await response.json();
-                            if (data && data.address) {
-                                const addr = data.address;
-                                const village = addr.village || addr.suburb || addr.hamlet || 'Bambu Apus';
-                                const district = addr.subdistrict || addr.district || 'Kecamatan Cipayung';
-                                const city = addr.city || addr.city_district || addr.county || 'Kota Jakarta Timur';
-                                const state = addr.state || 'Daerah Khusus Ibukota Jakarta';
-                                finalizeWatermark([village, district, city, state], true, lat, lon);
-                                return;
-                            }
-                        } catch (e) {
-                            console.error(e);
-                        }
-                        finalizeWatermark(['Bambu Apus', 'Kecamatan Cipayung', 'Kota Jakarta Timur', 'Daerah Khusus Ibukota Jakarta'], true, lat, lon);
-                    },
-                    () => {
-                        finalizeWatermark([], false, -6.3218, 106.9036);
-                    },
-                    { timeout: 6000, enableHighAccuracy: true }
-                );
-            } else {
-                finalizeWatermark([], false, -6.3218, 106.9036);
-            }
-        }
-
-        function addActivity(e) {
-            e.preventDefault();
-            const jamMulai = document.getElementById('act-jam-mulai').value;
-            const jamSelesai = document.getElementById('act-jam-selesai').value;
-            const deskripsi = document.getElementById('act-deskripsi').value;
-            const type = document.getElementById('act-doc-type').value;
-            const urlInput = document.getElementById('act-photo-url').value;
-
-            let finalImage = currentCapturedImage;
-            if (type === 'photo' && !finalImage && urlInput) {
-                finalImage = urlInput;
-            }
-
-            const newAct = {
-                id: Date.now().toString(),
-                jamMulai,
-                jamSelesai,
-                deskripsi,
-                type,
-                photoUrl: finalImage
-            };
-
-            appData.kegiatan.push(newAct);
-            updatePreview();
-
-            document.getElementById('activity-form').reset();
-            clearTempImage();
-            toggleDocInputType();
-        }
-
-        function deleteActivity(id) {
-            appData.kegiatan = appData.kegiatan.filter(a => a.id !== id);
-            updatePreview();
-        }
-
-        function renderActivities() {
-            const listContainer = document.getElementById('activity-list');
-            const tableBody = document.getElementById('prev-activity-table-body');
-            const badge = document.getElementById('activity-count-badge');
-
-            listContainer.innerHTML = '';
-            tableBody.innerHTML = '';
-            badge.innerText = `${appData.kegiatan.length} Kegiatan`;
-
-            if (appData.kegiatan.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="border border-slate-900 p-4 text-center text-slate-500 italic">
-                            Belum ada kegiatan yang ditambahkan.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            appData.kegiatan.forEach((act, idx) => {
-                const listItem = document.createElement('div');
-                listItem.className = 'flex justify-between items-center bg-slate-50 p-2 rounded border text-xs';
-                listItem.innerHTML = `
-                    <div class="truncate mr-2">
-                        <span class="font-semibold text-blue-700">[${act.jamMulai} - ${act.jamSelesai}]</span>
-                        <p class="truncate text-slate-700">${act.deskripsi}</p>
-                    </div>
-                    <button onclick="deleteActivity('${act.id}')" class="text-red-500 hover:text-red-700 p-1">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                listContainer.appendChild(listItem);
-
-                const tr = document.createElement('tr');
-                let docContent = '';
-
-                if (typeof act.photoUrl === 'object' && act.photoUrl !== null) {
-                    docContent = `
-                        <div class="text-center p-2 bg-slate-50 border rounded text-[8pt]">
-                            <i class="fas fa-file-alt text-amber-600 text-base mb-1 block"></i>
-                            <span class="font-medium block truncate">${act.photoUrl.fileName}</span>
-                            <span class="text-slate-500">${act.photoUrl.fileSize}</span>
-                        </div>
-                    `;
-                } else if (act.photoUrl) {
-                    docContent = `
-                        <img src="${act.photoUrl}" alt="Dokumentasi" class="max-h-36 w-auto mx-auto object-contain rounded border border-slate-300">
-                    `;
-                } else {
-                    docContent = `<span class="text-slate-400 italic text-center block">-</span>`;
-                }
-
-                tr.innerHTML = `
-                    <td class="border border-slate-900 p-2 text-center align-top font-medium">${idx + 1}</td>
-                    <td class="border border-slate-900 p-2 align-top">
-                        <div class="font-semibold mb-1">Jam Kegiatan: ${act.jamMulai} - ${act.jamSelesai}</div>
-                        <div>${act.deskripsi}</div>
-                    </td>
-                    <td class="border border-slate-900 p-2 align-top text-center">
-                        ${docContent}
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-
-        function resetForm() {
-            if (confirm('Apakah Anda yakin ingin mengosongkan kegiatan?')) {
-                appData.kegiatan = [];
-                updatePreview();
-            }
-        }
-
-        async function exportToPDF() {
-            const element = document.getElementById('pdf-content');
-            
-            element.classList.add('rendering-pdf');
-            element.classList.remove('shadow-xl', 'rounded', 'border');
-
-            const namaPegawai = appData.nama || 'Pegawai';
-            const tglFormatted = formatDate(appData.tanggal);
-            const fileNameFormatted = `${namaPegawai} SKP ${tglFormatted}.pdf`;
-
-            const opt = {
-                margin:       0,
-                filename:     fileNameFormatted,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: true,
-                    logging: false,
-                    letterRendering: true,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' }
-            };
-
-            try {
-                await html2pdf().set(opt).from(element).save();
-            } catch (err) {
-                console.error('PDF Export Error:', err);
-                alert('Gagal mengekspor PDF: Terjadi kesalahan saat memproses gambar/dokumen.');
-            } finally {
-                element.classList.remove('rendering-pdf');
-                element.classList.add('shadow-xl', 'rounded', 'border');
-            }
-        }
-
-        window.onload = initApp;
-    </script>
+    <!-- ===== Export overlay ===== -->
+    <div class="export-overlay" id="export-overlay" hidden>
+        <div class="export-card">
+            <span class="export-card__icon"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></span>
+            <h2>Menyiapkan PDF</h2>
+            <p id="export-status">Merender halaman 1 dari 1&hellip;</p>
+            <div class="progress"><span id="export-progress"></span></div>
+            <small>Jangan tutup halaman ini sampai proses selesai.</small>
+        </div>
+    </div>
+
+    <canvas id="watermark-canvas" hidden></canvas>
+
+    <script src="vendor/html2canvas.min.js" defer></script>
+    <script src="vendor/jspdf.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
