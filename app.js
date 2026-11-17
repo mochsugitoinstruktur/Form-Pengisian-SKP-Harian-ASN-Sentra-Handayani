@@ -1105,7 +1105,7 @@ function metaHtml(meta) {
                 <span class="doc-meta__value">${esc(meta.jabatan)}</span>
             </div>
             <div class="doc-meta__row">
-                <span class="doc-meta__label">Unit Kerja</span>
+                <span class="doc-meta__label">Satuan Kerja</span>
                 <span class="doc-meta__sep">:</span>
                 <span class="doc-meta__value">Sentra Handayani Jakarta</span>
             </div>
